@@ -2,10 +2,13 @@ const express = require('express');
 const cors = require('cors');
 const routes = require('./routes');
 const { env } = require('./config/env');
+const { connectDatabase } = require('./config/database');
 const { notFoundHandler } = require('./middleware/not-found.middleware');
 const { errorHandler } = require('./middleware/error.middleware');
 
 const app = express();
+
+app.connectDatabase = connectDatabase;
 
 app.use(
   cors({
