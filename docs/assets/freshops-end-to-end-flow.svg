@@ -1,0 +1,45 @@
+<svg width="1200" height="360" viewBox="0 0 1200 360" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">FreshOps AI End-to-End Flow</title>
+  <desc id="desc">Flow from image upload to dashboard insights and alerts.</desc>
+  <defs>
+    <style>
+      .title { font: 700 20px Arial, sans-serif; fill: #0f172a; }
+      .label { font: 600 14px Arial, sans-serif; fill: #0f172a; }
+      .small { font: 400 12px Arial, sans-serif; fill: #334155; }
+      .box { fill: #f8fafc; stroke: #2563eb; stroke-width: 2; rx: 12; }
+      .arrow { stroke: #475569; stroke-width: 2.5; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569" />
+    </marker>
+  </defs>
+
+  <text x="40" y="40" class="title">FreshOps AI — End-to-End Platform Flow</text>
+
+  <rect x="40" y="100" width="180" height="90" class="box" />
+  <text x="70" y="135" class="label">1) Capture Item</text>
+  <text x="56" y="158" class="small">Upload food image + metadata</text>
+
+  <rect x="260" y="100" width="180" height="90" class="box" />
+  <text x="285" y="135" class="label">2) AI Detection</text>
+  <text x="282" y="158" class="small">Identify item/category</text>
+
+  <rect x="480" y="100" width="180" height="90" class="box" />
+  <text x="500" y="135" class="label">3) Expiry Engine</text>
+  <text x="500" y="158" class="small">Predict shelf-life + status</text>
+
+  <rect x="700" y="100" width="180" height="90" class="box" />
+  <text x="726" y="135" class="label">4) Store & Track</text>
+  <text x="724" y="158" class="small">Persist in inventory DB</text>
+
+  <rect x="920" y="100" width="220" height="90" class="box" />
+  <text x="946" y="135" class="label">5) Alerts & Insights</text>
+  <text x="940" y="158" class="small">Dashboard + expiring alerts</text>
+
+  <path d="M220 145 H250" class="arrow" />
+  <path d="M440 145 H470" class="arrow" />
+  <path d="M660 145 H690" class="arrow" />
+  <path d="M880 145 H910" class="arrow" />
+
+  <text x="40" y="250" class="small">Outcome: teams reduce avoidable waste, prioritize expiring stock, and improve replenishment decisions.</text>
+</svg>

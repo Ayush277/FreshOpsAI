@@ -1,0 +1,68 @@
+<svg width="1200" height="460" viewBox="0 0 1200 460" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="title desc">
+  <title id="title">FreshOps AI Architecture Overview</title>
+  <desc id="desc">High-level architecture including frontend, backend services, AI, storage, and DevOps layers.</desc>
+  <defs>
+    <style>
+      .title { font: 700 20px Arial, sans-serif; fill: #0f172a; }
+      .layer { font: 700 15px Arial, sans-serif; fill: #1e293b; }
+      .label { font: 600 13px Arial, sans-serif; fill: #0f172a; }
+      .small { font: 400 12px Arial, sans-serif; fill: #334155; }
+      .outer { fill: #f8fafc; stroke: #cbd5e1; stroke-width: 2; rx: 14; }
+      .node { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 10; }
+      .arrow { stroke: #475569; stroke-width: 2.2; fill: none; marker-end: url(#arrowhead); }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#475569" />
+    </marker>
+  </defs>
+
+  <text x="40" y="36" class="title">FreshOps AI — Architecture Overview</text>
+
+  <rect x="30" y="60" width="1140" height="95" class="outer"/>
+  <text x="50" y="86" class="layer">Experience Layer</text>
+  <rect x="70" y="98" width="260" height="42" class="node"/>
+  <text x="135" y="124" class="label">Frontend Dashboard</text>
+  <rect x="370" y="98" width="260" height="42" class="node"/>
+  <text x="442" y="124" class="label">Upload Interface</text>
+
+  <rect x="30" y="170" width="1140" height="120" class="outer"/>
+  <text x="50" y="196" class="layer">Application Layer</text>
+  <rect x="70" y="208" width="230" height="60" class="node"/>
+  <text x="118" y="233" class="label">API Gateway / Routes</text>
+  <text x="120" y="251" class="small">Validation + auth hooks</text>
+
+  <rect x="340" y="208" width="230" height="60" class="node"/>
+  <text x="396" y="233" class="label">AI Service</text>
+  <text x="382" y="251" class="small">Food label detection</text>
+
+  <rect x="610" y="208" width="230" height="60" class="node"/>
+  <text x="650" y="233" class="label">Expiry Engine</text>
+  <text x="648" y="251" class="small">Rules + status scoring</text>
+
+  <rect x="880" y="208" width="250" height="60" class="node"/>
+  <text x="942" y="233" class="label">Alert Service</text>
+  <text x="930" y="251" class="small">Expiring/expired insights</text>
+
+  <rect x="30" y="305" width="1140" height="120" class="outer"/>
+  <text x="50" y="331" class="layer">Data + Platform Layer</text>
+  <rect x="70" y="343" width="260" height="60" class="node"/>
+  <text x="132" y="368" class="label">MongoDB Atlas</text>
+  <text x="122" y="386" class="small">Inventory + analytics data</text>
+
+  <rect x="370" y="343" width="260" height="60" class="node"/>
+  <text x="450" y="368" class="label">AWS S3</text>
+  <text x="432" y="386" class="small">Image object storage</text>
+
+  <rect x="670" y="343" width="460" height="60" class="node"/>
+  <text x="780" y="368" class="label">Docker + Jenkins + Terraform</text>
+  <text x="754" y="386" class="small">Build, deploy, and infrastructure automation</text>
+
+  <path d="M200 140 V200" class="arrow"/>
+  <path d="M500 140 V200" class="arrow"/>
+  <path d="M185 238 H330" class="arrow"/>
+  <path d="M455 238 H600" class="arrow"/>
+  <path d="M725 238 H870" class="arrow"/>
+  <path d="M200 268 V338" class="arrow"/>
+  <path d="M460 268 V338" class="arrow"/>
+  <path d="M920 268 V338" class="arrow"/>
+</svg>
