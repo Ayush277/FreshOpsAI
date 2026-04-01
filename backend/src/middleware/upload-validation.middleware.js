@@ -5,6 +5,7 @@ const ALLOWED_CATEGORIES = ['Dairy', 'Bakery', 'Fruits', 'Vegetables', 'Meat', '
 const isValidDateString = (value) => !Number.isNaN(new Date(value).getTime());
 
 const validateUploadRequest = (request, response, next) => {
+  const hasUploadedFile = Boolean(request.file);
   const {
     itemName,
     category,
@@ -35,11 +36,27 @@ const validateUploadRequest = (request, response, next) => {
     try {
       new URL(imageUrl);
     } catch (error) {
-      validationErrors.push({
-        field: 'imageUrl',
-        message: 'imageUrl must be a valid URL',
-      });
+      if (!hasUploadedFile) {
+        validationErrors.push({
+          field: 'imageUrl',
+          message: 'imageUrl must be a valid URL',
+        });
+      }
     }
+  }
+
+  if (!imageUrl && !hasUploadedFile) {
+    validationErrors.push({
+      field: 'image',
+      message: 'Provide either imageUrl or upload an image file using field name "image"',
+    });
+  }
+
+  if (hasUploadedFile && !request.file.mimetype.startsWith('image/')) {
+    validationErrors.push({
+      field: 'image',
+      message: 'Uploaded file must be an image',
+    });
   }
 
   if (detectedAt && !isValidDateString(detectedAt)) {
