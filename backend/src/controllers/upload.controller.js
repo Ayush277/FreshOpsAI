@@ -1,40 +1,27 @@
 const { uploadService } = require('../services/upload.service');
+const { sendSuccess } = require('../utils/api-response');
 
 const postUpload = async (request, response, next) => {
   try {
-    const {
+    const { itemName, category, imageUrl, detectedAt, expiryDate, daysRemaining } =
+      request.validatedBody;
+
+    const uploadedItem = await uploadService({
       itemName,
       category,
       imageUrl,
       detectedAt,
       expiryDate,
       daysRemaining,
-    } = request.body;
-
-    if (!itemName || typeof itemName !== 'string' || !itemName.trim()) {
-      const error = new Error(
-        'itemName is required for manual testing until AI detection is integrated'
-      );
-      error.statusCode = 400;
-      throw error;
-    }
-
-    const uploadedItem = await uploadService({
-      itemName: itemName.trim(),
-      category,
-      imageUrl,
-      detectedAt,
-      expiryDate,
-      daysRemaining,
     });
 
-    response.status(201).json({
-      status: 'success',
+    return sendSuccess(response, {
+      statusCode: 201,
       message: 'Item uploaded successfully',
       data: uploadedItem,
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

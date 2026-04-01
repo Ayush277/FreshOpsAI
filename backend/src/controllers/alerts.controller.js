@@ -1,21 +1,21 @@
 const { getAlertsService } = require('../services/alerts.service');
+const { sendSuccess } = require('../utils/api-response');
 
 const getAlerts = async (request, response, next) => {
   try {
     const alertsPayload = await getAlertsService();
 
-    response.status(200).json({
-      status: 'success',
+    return sendSuccess(response, {
       message: 'Alerts retrieved successfully',
-      count: alertsPayload.alertCount,
       data: alertsPayload.alerts,
-      summary: {
+      meta: {
+        count: alertsPayload.alertCount,
         totalItems: alertsPayload.totalItems,
         buckets: alertsPayload.buckets,
       },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

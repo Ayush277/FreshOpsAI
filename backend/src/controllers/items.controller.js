@@ -1,17 +1,19 @@
 const { getItemsService } = require('../services/items.service');
+const { sendSuccess } = require('../utils/api-response');
 
 const getItems = async (request, response, next) => {
   try {
     const items = await getItemsService();
 
-    response.status(200).json({
-      status: 'success',
+    return sendSuccess(response, {
       message: 'Items retrieved successfully',
-      count: items.length,
       data: items,
+      meta: {
+        count: items.length,
+      },
     });
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 

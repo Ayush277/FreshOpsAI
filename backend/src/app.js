@@ -5,6 +5,7 @@ const { env } = require('./config/env');
 const { connectDatabase } = require('./config/database');
 const { notFoundHandler } = require('./middleware/not-found.middleware');
 const { errorHandler } = require('./middleware/error.middleware');
+const { sendSuccess } = require('./utils/api-response');
 
 const app = express();
 
@@ -18,10 +19,12 @@ app.use(
 app.use(express.json());
 
 app.get('/', (request, response) => {
-  response.status(200).json({
-    service: 'freshops-ai-backend',
-    message: 'FreshOps AI backend is running.',
-    docs: '/health',
+  return sendSuccess(response, {
+    message: 'FreshOps AI backend is running',
+    data: {
+      service: 'freshops-ai-backend',
+      docs: '/health',
+    },
   });
 });
 
