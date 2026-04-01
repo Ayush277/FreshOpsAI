@@ -1,21 +1,60 @@
+const InventoryItem = require('../models/inventory-item.model');
+
+const CATEGORY_DEFAULT_DAYS = {
+  Dairy: 4,
+  Bakery: 3,
+  Fruits: 7,
+  Vegetables: 6,
+  Meat: 2,
+  General: 5,
+};
+
+const resolveStatus = (daysRemaining) => {
+  if (daysRemaining <= 0) {
+    return 'expired';
+  }
+
+  if (daysRemaining <= 2) {
+    return 'expiring-soon';
+  }
+
+  return 'fresh';
+};
+
 const uploadService = async (itemData) => {
-  const { itemName, category, imageUrl } = itemData;
-
-  const now = new Date();
-  const expiryDate = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
-  const daysRemaining = Math.floor((expiryDate - now) / (1000 * 60 * 60 * 24));
-
-  return {
-    id: `item-${Date.now()}`,
-    itemName: itemName || 'Unknown Item',
-    category: category || 'General',
-    imageUrl: imageUrl || null,
-    detectedAt: now.toISOString(),
-    expiryDate: expiryDate.toISOString(),
+  const {
+    itemName,
+    category,
+    imageUrl,
+    detectedAt,
+    expiryDate,
     daysRemaining,
-    status: daysRemaining > 5 ? 'fresh' : daysRemaining > 2 ? 'expiring-soon' : 'expired',
-    createdAt: now.toISOString(),
+  } = itemData;
+
+  const normalizedCategory = category || 'General';
+  const detectedAtDate = detectedAt ? new Date(detectedAt) : new Date();
+
+  const calculatedDaysRemaining =
+    Number.isFinite(daysRemaining) && daysRemaining !== null
+      ? Number(daysRemaining)
+      : CATEGORY_DEFAULT_DAYS[normalizedCategory] || CATEGORY_DEFAULT_DAYS.General;
+
+  const calculatedExpiryDate = expiryDate
+    ? new Date(expiryDate)
+    : new Date(detectedAtDate.getTime() + calculatedDaysRemaining * 24 * 60 * 60 * 1000);
+
+  const itemToCreate = {
+    itemName,
+    category: normalizedCategory,
+    imageUrl: imageUrl || null,
+    detectedAt: detectedAtDate,
+    expiryDate: calculatedExpiryDate,
+    daysRemaining: calculatedDaysRemaining,
+    status: resolveStatus(calculatedDaysRemaining),
   };
+
+  const createdItem = await InventoryItem.create(itemToCreate);
+  return createdItem;
 };
 
 module.exports = { uploadService };
