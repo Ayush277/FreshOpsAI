@@ -17,11 +17,10 @@ const validateUploadRequest = (request, response, next) => {
 
   const validationErrors = [];
 
-  if (!itemName || typeof itemName !== 'string' || !itemName.trim()) {
+  if (itemName && (typeof itemName !== 'string' || !itemName.trim())) {
     validationErrors.push({
       field: 'itemName',
-      message:
-        'itemName is required for manual testing until AI detection is integrated',
+      message: 'itemName must be a non-empty string when provided',
     });
   }
 

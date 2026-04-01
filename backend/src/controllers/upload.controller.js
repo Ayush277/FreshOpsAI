@@ -1,5 +1,7 @@
 const { uploadService } = require('../services/upload.service');
+const { detectFoodLabel } = require('../services/clarifai.service');
 const { sendSuccess } = require('../utils/api-response');
+const { AppError } = require('../utils/app-error');
 
 const postUpload = async (request, response, next) => {
   try {
@@ -9,8 +11,28 @@ const postUpload = async (request, response, next) => {
     const uploadedFile = request.file;
     const fileUrl = uploadedFile ? `/uploads/${uploadedFile.filename}` : imageUrl;
 
+    const aiDetection = await detectFoodLabel({
+      imageUrl,
+      filePath: uploadedFile?.path,
+    });
+
+    const resolvedItemName = aiDetection.success ? aiDetection.label : itemName;
+
+    if (!resolvedItemName) {
+      throw new AppError(
+        'Unable to determine item name. Provide manual itemName or configure Clarifai correctly.',
+        400,
+        [
+          {
+            field: 'itemName',
+            message: aiDetection.reason || 'No manual itemName and AI detection unavailable.',
+          },
+        ]
+      );
+    }
+
     const uploadedItem = await uploadService({
-      itemName,
+      itemName: resolvedItemName,
       category,
       imageUrl: fileUrl,
       detectedAt,
@@ -33,6 +55,15 @@ const postUpload = async (request, response, next) => {
               path: fileUrl,
             }
           : null,
+        aiDetection: {
+          provider: aiDetection.provider || 'clarifai',
+          success: aiDetection.success,
+          detectedLabel: aiDetection.success ? aiDetection.label : null,
+          confidence: aiDetection.success ? aiDetection.confidence : null,
+          reason: aiDetection.success ? null : aiDetection.reason,
+          details: aiDetection.success ? null : aiDetection.details || null,
+          usedFallbackItemName: !aiDetection.success && Boolean(itemName),
+        },
       },
     });
   } catch (error) {
