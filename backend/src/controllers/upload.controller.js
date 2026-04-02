@@ -38,13 +38,15 @@ const postUpload = async (request, response, next) => {
       detectedAt,
       expiryDate,
       daysRemaining,
+      aiDetection,
     });
 
     return sendSuccess(response, {
       statusCode: 201,
       message: 'Item uploaded successfully',
       data: {
-        item: uploadedItem,
+        item: uploadedItem.item,
+        expiryPlan: uploadedItem.expiryPlan,
         file: uploadedFile
           ? {
               fieldName: uploadedFile.fieldname,

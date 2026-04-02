@@ -1,25 +1,5 @@
 const InventoryItem = require('../models/inventory-item.model');
-
-const CATEGORY_DEFAULT_DAYS = {
-  Dairy: 4,
-  Bakery: 3,
-  Fruits: 7,
-  Vegetables: 6,
-  Meat: 2,
-  General: 5,
-};
-
-const resolveStatus = (daysRemaining) => {
-  if (daysRemaining <= 0) {
-    return 'expired';
-  }
-
-  if (daysRemaining <= 2) {
-    return 'expiring-soon';
-  }
-
-  return 'fresh';
-};
+const { calculateExpiryPlan } = require('./expiry.service');
 
 const uploadService = async (itemData) => {
   const {
@@ -29,32 +9,40 @@ const uploadService = async (itemData) => {
     detectedAt,
     expiryDate,
     daysRemaining,
+    aiDetection,
   } = itemData;
 
-  const normalizedCategory = category || 'General';
-  const detectedAtDate = detectedAt ? new Date(detectedAt) : new Date();
-
-  const calculatedDaysRemaining =
-    Number.isFinite(daysRemaining) && daysRemaining !== null
-      ? Number(daysRemaining)
-      : CATEGORY_DEFAULT_DAYS[normalizedCategory] || CATEGORY_DEFAULT_DAYS.General;
-
-  const calculatedExpiryDate = expiryDate
-    ? new Date(expiryDate)
-    : new Date(detectedAtDate.getTime() + calculatedDaysRemaining * 24 * 60 * 60 * 1000);
+  const expiryPlan = calculateExpiryPlan({
+    detectedLabel: aiDetection?.success ? aiDetection.label : itemName,
+    fallbackCategory: category || 'General',
+    detectedAt,
+    manualDaysRemaining: daysRemaining,
+    manualExpiryDate: expiryDate,
+  });
 
   const itemToCreate = {
     itemName,
-    category: normalizedCategory,
+    category: expiryPlan.category,
     imageUrl: imageUrl || null,
-    detectedAt: detectedAtDate,
-    expiryDate: calculatedExpiryDate,
-    daysRemaining: calculatedDaysRemaining,
-    status: resolveStatus(calculatedDaysRemaining),
+    detectedAt: expiryPlan.detectedAt,
+    expiryDate: expiryPlan.expiryDate,
+    daysRemaining: expiryPlan.daysRemaining,
+    status: expiryPlan.status,
   };
 
   const createdItem = await InventoryItem.create(itemToCreate);
-  return createdItem;
+
+  return {
+    item: createdItem,
+    expiryPlan: {
+      category: expiryPlan.category,
+      detectedAt: expiryPlan.detectedAt,
+      expiryDate: expiryPlan.expiryDate,
+      daysRemaining: expiryPlan.daysRemaining,
+      status: expiryPlan.status,
+      shelfLifeDays: expiryPlan.shelfLifeDays,
+    },
+  };
 };
 
 module.exports = { uploadService };
