@@ -1,6 +1,16 @@
+const LABEL_SHELF_LIFE_DAYS = {
+  milk: 3,
+  bread: 5,
+  fruits: 7,
+  fruit: 7,
+  vegetables: 6,
+  vegetable: 6,
+  yogurt: 7,
+};
+
 const CATEGORY_SHELF_LIFE_DAYS = {
-  Dairy: 4,
-  Bakery: 3,
+  Dairy: 3,
+  Bakery: 5,
   Fruits: 7,
   Vegetables: 6,
   Meat: 2,
@@ -15,12 +25,16 @@ const FOOD_LABEL_CATEGORY_MAP = {
   bread: 'Bakery',
   pastry: 'Bakery',
   cake: 'Bakery',
+  fruits: 'Fruits',
+  fruit: 'Fruits',
   apple: 'Fruits',
   banana: 'Fruits',
   orange: 'Fruits',
   grape: 'Fruits',
   strawberry: 'Fruits',
   mango: 'Fruits',
+  vegetables: 'Vegetables',
+  vegetable: 'Vegetables',
   spinach: 'Vegetables',
   broccoli: 'Vegetables',
   carrot: 'Vegetables',
@@ -59,6 +73,21 @@ const resolveCategoryFromLabel = (label, fallbackCategory = 'General') => {
   return fallbackCategory || 'General';
 };
 
+const resolveShelfLifeDays = (detectedLabel, category = 'General', fallbackDays = 5) => {
+  const normalizedLabel = normalizeText(detectedLabel);
+
+  if (normalizedLabel && LABEL_SHELF_LIFE_DAYS[normalizedLabel] !== undefined) {
+    return LABEL_SHELF_LIFE_DAYS[normalizedLabel];
+  }
+
+  const normalizedCategory = category || 'General';
+  if (CATEGORY_SHELF_LIFE_DAYS[normalizedCategory] !== undefined) {
+    return CATEGORY_SHELF_LIFE_DAYS[normalizedCategory];
+  }
+
+  return fallbackDays;
+};
+
 const resolveStatus = (daysRemaining) => {
   if (daysRemaining <= 0) {
     return 'expired';
@@ -84,7 +113,7 @@ const calculateExpiryPlan = ({
   const shelfLifeDays =
     Number.isFinite(manualDaysRemaining) && manualDaysRemaining !== null
       ? Number(manualDaysRemaining)
-      : CATEGORY_SHELF_LIFE_DAYS[category] || CATEGORY_SHELF_LIFE_DAYS.General;
+      : resolveShelfLifeDays(detectedLabel, category, CATEGORY_SHELF_LIFE_DAYS.General);
 
   const expiryDate = manualExpiryDate
     ? new Date(manualExpiryDate)
@@ -106,6 +135,8 @@ const calculateExpiryPlan = ({
 module.exports = {
   calculateExpiryPlan,
   resolveCategoryFromLabel,
+  resolveShelfLifeDays,
   resolveStatus,
   CATEGORY_SHELF_LIFE_DAYS,
+  LABEL_SHELF_LIFE_DAYS,
 };
