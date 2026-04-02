@@ -1,3 +1,7 @@
+const {
+  resolveCategoryFromLabel,
+} = require('./food-label-mapping.service');
+
 const LABEL_SHELF_LIFE_DAYS = {
   milk: 3,
   bread: 5,
@@ -17,61 +21,9 @@ const CATEGORY_SHELF_LIFE_DAYS = {
   General: 5,
 };
 
-const FOOD_LABEL_CATEGORY_MAP = {
-  milk: 'Dairy',
-  cheese: 'Dairy',
-  yogurt: 'Dairy',
-  butter: 'Dairy',
-  bread: 'Bakery',
-  pastry: 'Bakery',
-  cake: 'Bakery',
-  fruits: 'Fruits',
-  fruit: 'Fruits',
-  apple: 'Fruits',
-  banana: 'Fruits',
-  orange: 'Fruits',
-  grape: 'Fruits',
-  strawberry: 'Fruits',
-  mango: 'Fruits',
-  vegetables: 'Vegetables',
-  vegetable: 'Vegetables',
-  spinach: 'Vegetables',
-  broccoli: 'Vegetables',
-  carrot: 'Vegetables',
-  lettuce: 'Vegetables',
-  cucumber: 'Vegetables',
-  tomato: 'Vegetables',
-  chicken: 'Meat',
-  beef: 'Meat',
-  fish: 'Meat',
-};
-
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
 const normalizeText = (value) => (value || '').toString().trim().toLowerCase();
-
-const resolveCategoryFromLabel = (label, fallbackCategory = 'General') => {
-  const normalizedLabel = normalizeText(label);
-
-  if (!normalizedLabel) {
-    return fallbackCategory || 'General';
-  }
-
-  const directMatch = FOOD_LABEL_CATEGORY_MAP[normalizedLabel];
-  if (directMatch) {
-    return directMatch;
-  }
-
-  const matchedEntry = Object.entries(FOOD_LABEL_CATEGORY_MAP).find(([key]) =>
-    normalizedLabel.includes(key)
-  );
-
-  if (matchedEntry) {
-    return matchedEntry[1];
-  }
-
-  return fallbackCategory || 'General';
-};
 
 const resolveShelfLifeDays = (detectedLabel, category = 'General', fallbackDays = 5) => {
   const normalizedLabel = normalizeText(detectedLabel);
