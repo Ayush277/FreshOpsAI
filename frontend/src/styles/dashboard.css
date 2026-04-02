@@ -1,0 +1,47 @@
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 1rem;
+}
+
+.summary-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1rem;
+  box-shadow: 0 8px 26px rgba(26, 41, 87, 0.05);
+}
+
+.summary-card p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.86rem;
+}
+
+.summary-card h3 {
+  margin: 0.5rem 0 0;
+  font-size: 1.6rem;
+}
+
+.summary-fresh h3 { color: var(--success); }
+.summary-warning h3 { color: var(--warning); }
+.summary-danger h3 { color: var(--danger); }
+.summary-accent h3 { color: var(--primary); }
+
+.insight-panel {
+  margin-top: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  background: #fff;
+  padding: 1rem;
+}
+
+.insight-panel h3 {
+  margin: 0;
+}
+
+.insight-panel p {
+  margin: 0.6rem 0 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
