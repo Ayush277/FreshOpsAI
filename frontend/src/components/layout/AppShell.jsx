@@ -1,8 +1,9 @@
 import { Link, useLocation } from 'react-router-dom';
 
 const navigationLinks = [
-  { label: 'Dashboard', path: '/' },
-  { label: 'Upload', path: '/upload' },
+  { label: 'Overview', path: '/' },
+  { label: 'Detection', path: '/upload' },
+  { label: 'Inventory', path: '/inventory' },
 ];
 
 export const AppShell = ({ title, subtitle, actions, children }) => {

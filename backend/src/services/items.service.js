@@ -1,54 +1,57 @@
+const InventoryItem = require('../models/inventory-item.model');
+
+const MS_PER_DAY = 1000 * 60 * 60 * 24;
+
+const resolveStatus = (daysRemaining) => {
+  if (daysRemaining <= 0) {
+    return 'expired';
+  }
+
+  if (daysRemaining <= 2) {
+    return 'expiring-soon';
+  }
+
+  return 'fresh';
+};
+
 const getItemsService = async () => {
   const now = new Date();
+  const inventoryItems = await InventoryItem.find({}).sort({ createdAt: -1 });
 
-  const mockItems = [
-    {
-      id: 'item-001',
-      itemName: 'Milk',
-      category: 'Dairy',
-      imageUrl: 'https://images.example.com/milk.jpg',
-      detectedAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-      expiryDate: new Date(now.getTime() + 1 * 24 * 60 * 60 * 1000).toISOString(),
-      daysRemaining: 1,
-      status: 'expiring-soon',
-      createdAt: new Date(now.getTime() - 2 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: 'item-002',
-      itemName: 'Bread',
-      category: 'Bakery',
-      imageUrl: 'https://images.example.com/bread.jpg',
-      detectedAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      expiryDate: new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000).toISOString(),
-      daysRemaining: 3,
-      status: 'fresh',
-      createdAt: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: 'item-003',
-      itemName: 'Apples',
-      category: 'Fruits',
-      imageUrl: 'https://images.example.com/apples.jpg',
-      detectedAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      expiryDate: new Date(now.getTime() + 5 * 24 * 60 * 60 * 1000).toISOString(),
-      daysRemaining: 5,
-      status: 'fresh',
-      createdAt: new Date(now.getTime() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-    {
-      id: 'item-004',
-      itemName: 'Yogurt',
-      category: 'Dairy',
-      imageUrl: 'https://images.example.com/yogurt.jpg',
-      detectedAt: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-      expiryDate: new Date(now.getTime() - 1 * 24 * 60 * 60 * 1000).toISOString(),
-      daysRemaining: -1,
-      status: 'expired',
-      createdAt: new Date(now.getTime() - 4 * 24 * 60 * 60 * 1000).toISOString(),
-    },
-  ];
+  const statusUpdates = [];
+  const normalizedItems = inventoryItems.map((item) => {
+    const expiryDate = new Date(item.expiryDate);
+    const daysRemaining = Math.ceil((expiryDate.getTime() - now.getTime()) / MS_PER_DAY);
+    const status = resolveStatus(daysRemaining);
 
-  return mockItems;
+    if (item.status !== status || item.daysRemaining !== daysRemaining) {
+      statusUpdates.push({
+        updateOne: {
+          filter: { _id: item._id },
+          update: { $set: { status, daysRemaining } },
+        },
+      });
+    }
+
+    return {
+      id: item._id,
+      itemName: item.itemName,
+      category: item.category,
+      imageUrl: item.imageUrl,
+      detectedAt: item.detectedAt,
+      expiryDate: item.expiryDate,
+      daysRemaining,
+      status,
+      createdAt: item.createdAt,
+      updatedAt: item.updatedAt,
+    };
+  });
+
+  if (statusUpdates.length > 0) {
+    await InventoryItem.bulkWrite(statusUpdates);
+  }
+
+  return normalizedItems;
 };
 
 module.exports = { getItemsService };

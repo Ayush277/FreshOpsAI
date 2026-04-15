@@ -5,11 +5,13 @@ export const useUploadItem = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [result, setResult] = useState(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const uploadItem = async ({ itemName, category, imageFile }) => {
     try {
       setLoading(true);
       setError('');
+      setSuccessMessage('');
       const formData = new FormData();
       formData.append('itemName', itemName);
       formData.append('category', category);
@@ -17,9 +19,11 @@ export const useUploadItem = () => {
 
       const response = await uploadApi.createItem(formData);
       setResult(response.data);
+      setSuccessMessage('Upload completed successfully. Detection and expiry insights are ready.');
       return response.data;
     } catch (requestError) {
       setError(requestError.message);
+      setSuccessMessage('');
       throw requestError;
     } finally {
       setLoading(false);
@@ -28,6 +32,7 @@ export const useUploadItem = () => {
 
   const resetUploadState = () => {
     setError('');
+    setSuccessMessage('');
     setResult(null);
   };
 
@@ -37,5 +42,6 @@ export const useUploadItem = () => {
     loading,
     error,
     result,
+    successMessage,
   };
 };

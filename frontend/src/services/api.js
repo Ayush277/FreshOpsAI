@@ -26,3 +26,7 @@ export const uploadApi = {
       body: formData,
     }),
 };
+
+export const inventoryApi = {
+  getAll: () => request('/items'),
+};
