@@ -3,9 +3,9 @@
   grid-template-columns: 1fr auto;
   gap: 1rem;
   align-items: center;
-  background: linear-gradient(135deg, #111a3a 0%, #1b2a5c 100%);
+  background: linear-gradient(135deg, rgba(34, 42, 61, 0.95) 0%, rgba(19, 27, 46, 0.92) 100%);
   border-radius: 18px;
-  color: #fff;
+  color: var(--text);
   padding: 1.1rem 1.2rem;
   margin-bottom: 1rem;
   box-shadow: 0 14px 28px rgba(17, 26, 58, 0.24);
@@ -16,7 +16,7 @@
   font-size: 0.76rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #c7d2fe;
+  color: #a0fff4;
 }
 
 .upload-intro-card h3 {
@@ -26,7 +26,7 @@
 
 .upload-intro-card p {
   margin: 0;
-  color: #dbe2ff;
+  color: #b2c3e6;
   font-size: 0.9rem;
   line-height: 1.45;
 }
@@ -37,8 +37,8 @@
 }
 
 .upload-intro-stats div {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.14);
+  background: rgba(60, 221, 199, 0.1);
+  border: 1px solid rgba(60, 221, 199, 0.2);
   border-radius: 12px;
   padding: 0.55rem 0.7rem;
   min-width: 160px;
@@ -47,7 +47,7 @@
 .upload-intro-stats span {
   display: block;
   font-size: 0.72rem;
-  color: #c7d2fe;
+  color: #9df5ea;
   margin-bottom: 0.15rem;
 }
 
@@ -100,10 +100,10 @@
 
 .file-input-wrapper {
   position: relative;
-  border: 1px dashed #c7d2fe;
+  border: 1px dashed rgba(60, 221, 199, 0.4);
   border-radius: 14px;
   padding: 0.8rem;
-  background: #f8faff;
+  background: rgba(6, 14, 32, 0.62);
   display: grid;
   gap: 0.2rem;
 }
@@ -133,12 +133,12 @@
   align-items: center;
   justify-content: center;
   width: fit-content;
-  border: 1px solid #c7d2fe;
+  border: 1px solid rgba(60, 221, 199, 0.35);
   border-radius: 999px;
   padding: 0.35rem 0.72rem;
   font-size: 0.78rem;
-  color: #3730a3;
-  background: #fff;
+  color: #a8fff5;
+  background: rgba(60, 221, 199, 0.12);
 }
 
 .upload-inline-error {
@@ -153,8 +153,8 @@
   grid-template-columns: 76px 1fr;
   gap: 0.8rem;
   align-items: center;
-  background: #f6f8ff;
-  border: 1px solid #dfe7ff;
+  background: rgba(6, 14, 32, 0.65);
+  border: 1px solid rgba(188, 201, 198, 0.2);
   border-radius: 12px;
   padding: 0.7rem;
 }
@@ -210,8 +210,8 @@
 }
 
 .result-card {
-  background: #f8faff;
-  border: 1px solid #e5ebff;
+  background: rgba(6, 14, 32, 0.64);
+  border: 1px solid rgba(188, 201, 198, 0.18);
   border-radius: 12px;
   padding: 0.72rem;
 }

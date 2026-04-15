@@ -9,6 +9,7 @@ const navigationLinks = [
 
 export const AppShell = ({ title, subtitle, actions, children }) => {
   const location = useLocation();
+  const currentSection = navigationLinks.find((link) => link.path === location.pathname)?.label || 'Overview';
 
   return (
     <div className="app-shell">
@@ -38,6 +39,15 @@ export const AppShell = ({ title, subtitle, actions, children }) => {
       </aside>
 
       <main className="app-content">
+        <div className="shell-topbar">
+          <span className="shell-breadcrumb">FreshOps / {currentSection}</span>
+          <div className="shell-topbar-right">
+            <span className="topbar-chip">Realtime</span>
+            <span className="topbar-chip">AI Enabled</span>
+            <span className="topbar-user">Ops Admin</span>
+          </div>
+        </div>
+
         <header className="page-header">
           <div>
             <h2>{title}</h2>
@@ -47,6 +57,11 @@ export const AppShell = ({ title, subtitle, actions, children }) => {
         </header>
 
         <section className="page-body">{children}</section>
+
+        <footer className="app-footer">
+          <p>FreshOps AI · Executive Control Surface</p>
+          <span>Green Monochrome Theme</span>
+        </footer>
       </main>
     </div>
   );

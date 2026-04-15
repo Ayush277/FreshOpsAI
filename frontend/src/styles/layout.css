@@ -18,7 +18,7 @@
 
 .brand-block p {
   margin: 0;
-  color: var(--muted);
+  color: #9dafd4;
   line-height: 1.5;
   font-size: 0.9rem;
 }
@@ -43,6 +43,49 @@
   font-size: 0.68rem;
   font-weight: 700;
   letter-spacing: 0.05em;
+}
+
+.shell-topbar {
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: rgba(23, 31, 51, 0.74);
+  padding: 0.6rem 0.8rem;
+  backdrop-filter: blur(12px);
+}
+
+.shell-breadcrumb {
+  font-size: 0.78rem;
+  color: #9fb1d7;
+  letter-spacing: 0.03em;
+}
+
+.shell-topbar-right {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.topbar-chip {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: #a9fff5;
+  background: rgba(60, 221, 199, 0.12);
+  border: 1px solid rgba(60, 221, 199, 0.22);
+}
+
+.topbar-user {
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  color: #d7e6ff;
+  background: rgba(137, 206, 255, 0.12);
+  border: 1px solid rgba(137, 206, 255, 0.2);
 }
 
 .app-nav {
@@ -98,6 +141,7 @@
 .page-header h2 {
   margin: 0;
   font-size: 1.7rem;
+  letter-spacing: -0.01em;
 }
 
 .page-header p {
@@ -107,6 +151,21 @@
 
 .page-body {
   margin-top: 1.5rem;
+}
+
+.app-footer {
+  margin-top: 1.4rem;
+  border-top: 1px solid rgba(188, 201, 198, 0.16);
+  padding-top: 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 0.8rem;
+  color: #8ea2ca;
+  font-size: 0.76rem;
+}
+
+.app-footer p {
+  margin: 0;
 }
 
 .state-banner {
@@ -121,9 +180,9 @@
 }
 
 .state-error {
-  background: rgba(255, 180, 171, 0.13);
-  color: #ffd3ce;
-  border-color: rgba(255, 180, 171, 0.32);
+  background: rgba(116, 183, 177, 0.16);
+  color: #d8fffa;
+  border-color: rgba(116, 183, 177, 0.32);
 }
 
 .state-success {
@@ -140,5 +199,18 @@
   .app-sidebar {
     border-right: none;
     border-bottom: 1px solid var(--border);
+  }
+
+  .shell-topbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .shell-topbar-right {
+    flex-wrap: wrap;
+  }
+
+  .app-footer {
+    flex-direction: column;
   }
 }

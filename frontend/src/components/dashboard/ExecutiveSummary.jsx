@@ -7,20 +7,30 @@ export const ExecutiveSummary = () => {
 
   const cards = useMemo(
     () => [
-      { label: 'Total Items', value: summary?.totalItems ?? 0, tone: 'neutral', trend: 'Inventory Base' },
-      { label: 'Fresh Items', value: summary?.freshItems ?? 0, tone: 'fresh', trend: 'Healthy' },
+      {
+        label: 'Total Items',
+        value: summary?.totalItems ?? 0,
+        tone: 'neutral',
+        trend: 'Inventory Base',
+        size: 'wide',
+        icon: '⬢',
+      },
+      { label: 'Fresh Items', value: summary?.freshItems ?? 0, tone: 'fresh', trend: 'Healthy', icon: '●' },
       {
         label: 'Expiring Soon',
         value: summary?.expiringSoonItems ?? 0,
         tone: 'warning',
         trend: 'Monitor Closely',
+        icon: '◐',
       },
-      { label: 'Expired', value: summary?.expiredItems ?? 0, tone: 'danger', trend: 'Action Required' },
+      { label: 'Expired', value: summary?.expiredItems ?? 0, tone: 'danger', trend: 'Action Required', icon: '◉' },
       {
         label: 'Waste Percentage',
         value: `${summary?.wastePercentage ?? 0}%`,
         tone: 'accent',
         trend: 'Performance',
+        size: 'tall',
+        icon: '◍',
       },
     ],
     [summary]
@@ -52,6 +62,8 @@ export const ExecutiveSummary = () => {
             value={card.value}
             tone={card.tone}
             trend={card.trend}
+            size={card.size}
+            icon={card.icon}
           />
         ))}
       </div>

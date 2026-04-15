@@ -27,21 +27,21 @@
 }
 
 .alerts-summary-warning {
-  border-color: rgba(255, 205, 114, 0.42);
-  background: linear-gradient(130deg, rgba(255, 205, 114, 0.14) 0%, rgba(23, 31, 51, 0.9) 100%);
+  border-color: rgba(143, 211, 204, 0.42);
+  background: linear-gradient(130deg, rgba(143, 211, 204, 0.16) 0%, rgba(23, 31, 51, 0.9) 100%);
 }
 
 .alerts-summary-warning h3 {
-  color: #ffe4ae;
+  color: #d7fffb;
 }
 
 .alerts-summary-danger {
-  border-color: rgba(255, 180, 171, 0.45);
-  background: linear-gradient(130deg, rgba(255, 180, 171, 0.14) 0%, rgba(23, 31, 51, 0.9) 100%);
+  border-color: rgba(116, 183, 177, 0.45);
+  background: linear-gradient(130deg, rgba(116, 183, 177, 0.18) 0%, rgba(23, 31, 51, 0.9) 100%);
 }
 
 .alerts-summary-danger h3 {
-  color: #ffd7d2;
+  color: #d9fffb;
 }
 
 .alerts-grid {
@@ -76,13 +76,13 @@
 }
 
 .alert-status-pill-expiring-soon {
-  background: rgba(255, 205, 114, 0.2);
-  color: #ffe4ae;
+  background: rgba(143, 211, 204, 0.2);
+  color: #d6fffb;
 }
 
 .alert-status-pill-expired {
-  background: rgba(255, 180, 171, 0.2);
-  color: #ffd7d2;
+  background: rgba(116, 183, 177, 0.24);
+  color: #dbfffb;
 }
 
 .alert-severity {
