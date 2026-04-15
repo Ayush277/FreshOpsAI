@@ -13,7 +13,7 @@
   display: inline-block;
   padding: 0.25rem 0.6rem;
   background: var(--primary-soft);
-  color: var(--primary);
+  color: #85fff0;
   border-radius: 99px;
   font-size: 0.72rem;
   font-weight: 700;
@@ -41,11 +41,12 @@
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
-  background: #fff;
+  background: linear-gradient(140deg, rgba(34, 42, 61, 0.88) 0%, rgba(23, 31, 51, 0.84) 100%);
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 1rem 1.15rem;
   box-shadow: var(--shadow-soft);
+  backdrop-filter: blur(10px);
 }
 
 .executive-summary-header h3 {
@@ -68,7 +69,7 @@
 
 .summary-card {
   position: relative;
-  background: var(--surface);
+  background: linear-gradient(160deg, rgba(45, 52, 73, 0.82) 0%, rgba(23, 31, 51, 0.86) 100%);
   border: 1px solid var(--border);
   border-radius: 18px;
   padding: 1.2rem;
@@ -90,7 +91,7 @@
 
 .summary-label {
   margin: 0;
-  color: var(--muted);
+  color: #9eb0d6;
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -99,8 +100,8 @@
 
 .summary-trend {
   font-size: 0.68rem;
-  color: var(--muted);
-  background: #f1f5f9;
+  color: #b8d4ff;
+  background: rgba(98, 250, 227, 0.1);
   padding: 0.15rem 0.4rem;
   border-radius: 4px;
 }
@@ -118,7 +119,7 @@
   left: 0;
   height: 4px;
   width: 100%;
-  background: #e2e8f0;
+  background: rgba(137, 206, 255, 0.28);
 }
 
 .summary-fresh .summary-indicator { background: var(--success); }
@@ -130,9 +131,9 @@
   display: grid;
   grid-template-columns: 1.2fr 1fr;
   gap: 1rem;
-  border: 1px solid #dfe7ff;
+  border: 1px solid rgba(137, 206, 255, 0.26);
   border-radius: 18px;
-  background: linear-gradient(135deg, #f8faff 0%, #ffffff 100%);
+  background: linear-gradient(130deg, rgba(19, 27, 46, 0.95) 0%, rgba(34, 42, 61, 0.9) 100%);
   padding: 1rem 1.15rem;
   box-shadow: var(--shadow-soft);
 }
@@ -164,15 +165,15 @@
 }
 
 .kpi-breakdown div {
-  border: 1px solid #e6edff;
+  border: 1px solid rgba(188, 201, 198, 0.2);
   border-radius: 12px;
-  background: #fff;
+  background: rgba(6, 14, 32, 0.7);
   padding: 0.7rem;
 }
 
 .kpi-breakdown span {
   display: block;
-  color: #64748b;
+  color: #8ea0c6;
   font-size: 0.73rem;
 }
 
@@ -186,7 +187,7 @@
   margin-top: 1.5rem;
   border: 1px solid var(--border);
   border-radius: 20px;
-  background: white;
+  background: linear-gradient(140deg, rgba(23, 31, 51, 0.86) 0%, rgba(19, 27, 46, 0.88) 100%);
   padding: 1.5rem;
   box-shadow: var(--shadow-soft);
 }

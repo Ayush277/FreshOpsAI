@@ -1,10 +1,10 @@
 import { Link, useLocation } from 'react-router-dom';
 
 const navigationLinks = [
-  { label: 'Overview', path: '/' },
-  { label: 'Detection', path: '/upload' },
-  { label: 'Inventory', path: '/inventory' },
-  { label: 'Alerts', path: '/alerts' },
+  { label: 'Overview', path: '/', icon: '⬢' },
+  { label: 'Detection', path: '/upload', icon: '◉' },
+  { label: 'Inventory', path: '/inventory', icon: '▤' },
+  { label: 'Alerts', path: '/alerts', icon: '⚠' },
 ];
 
 export const AppShell = ({ title, subtitle, actions, children }) => {
@@ -17,6 +17,7 @@ export const AppShell = ({ title, subtitle, actions, children }) => {
           <span className="brand-badge">FreshOps AI</span>
           <h1>Perishable Intelligence</h1>
           <p>Operational visibility for every shelf-life decision.</p>
+          <span className="brand-live">LIVE TELEMETRY</span>
         </div>
 
         <nav className="app-nav">
@@ -28,6 +29,7 @@ export const AppShell = ({ title, subtitle, actions, children }) => {
                 to={link.path}
                 className={`nav-link ${isActive ? 'nav-link-active' : ''}`}
               >
+                <span className="nav-icon">{link.icon}</span>
                 {link.label}
               </Link>
             );

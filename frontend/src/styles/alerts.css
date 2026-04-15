@@ -9,7 +9,7 @@
   border-radius: 16px;
   padding: 0.9rem 1rem;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: linear-gradient(150deg, rgba(23, 31, 51, 0.88) 0%, rgba(19, 27, 46, 0.9) 100%);
   box-shadow: var(--shadow-soft);
 }
 
@@ -27,21 +27,21 @@
 }
 
 .alerts-summary-warning {
-  border-color: #fde68a;
-  background: #fffaf0;
+  border-color: rgba(255, 205, 114, 0.42);
+  background: linear-gradient(130deg, rgba(255, 205, 114, 0.14) 0%, rgba(23, 31, 51, 0.9) 100%);
 }
 
 .alerts-summary-warning h3 {
-  color: #b45309;
+  color: #ffe4ae;
 }
 
 .alerts-summary-danger {
-  border-color: #fecaca;
-  background: #fff4f4;
+  border-color: rgba(255, 180, 171, 0.45);
+  background: linear-gradient(130deg, rgba(255, 180, 171, 0.14) 0%, rgba(23, 31, 51, 0.9) 100%);
 }
 
 .alerts-summary-danger h3 {
-  color: #b91c1c;
+  color: #ffd7d2;
 }
 
 .alerts-grid {
@@ -54,7 +54,7 @@
   border-radius: 18px;
   padding: 1rem;
   border: 1px solid var(--border);
-  background: var(--surface);
+  background: linear-gradient(150deg, rgba(23, 31, 51, 0.9) 0%, rgba(19, 27, 46, 0.92) 100%);
   box-shadow: var(--shadow-soft);
 }
 
@@ -76,13 +76,13 @@
 }
 
 .alert-status-pill-expiring-soon {
-  background: #fef3c7;
-  color: #92400e;
+  background: rgba(255, 205, 114, 0.2);
+  color: #ffe4ae;
 }
 
 .alert-status-pill-expired {
-  background: #fee2e2;
-  color: #991b1b;
+  background: rgba(255, 180, 171, 0.2);
+  color: #ffd7d2;
 }
 
 .alert-severity {
@@ -99,7 +99,7 @@
 
 .alert-message {
   margin: 0.5rem 0 0;
-  color: #334155;
+  color: #b4c3e4;
   line-height: 1.45;
 }
 
@@ -111,16 +111,16 @@
 }
 
 .alert-meta-grid div {
-  background: #f8fafc;
+  background: rgba(6, 14, 32, 0.74);
   border-radius: 10px;
   padding: 0.55rem;
-  border: 1px solid #edf2f7;
+  border: 1px solid rgba(188, 201, 198, 0.16);
 }
 
 .alert-meta-grid span {
   display: block;
   font-size: 0.72rem;
-  color: #64748b;
+  color: #90a1c7;
 }
 
 .alert-meta-grid strong {
@@ -136,10 +136,10 @@
 }
 
 .alerts-empty-state {
-  border: 2px dashed #dbe5f5;
+  border: 2px dashed rgba(188, 201, 198, 0.2);
   border-radius: 18px;
   padding: 2rem;
-  background: #fff;
+  background: linear-gradient(150deg, rgba(23, 31, 51, 0.88) 0%, rgba(19, 27, 46, 0.95) 100%);
   text-align: center;
 }
 

@@ -1,13 +1,14 @@
 .app-shell {
   display: grid;
-  grid-template-columns: 300px 1fr;
+  grid-template-columns: 280px 1fr;
   min-height: 100vh;
 }
 
 .app-sidebar {
   padding: 1.6rem;
   border-right: 1px solid var(--border);
-  background: linear-gradient(180deg, #ffffff 0%, #f8faff 100%);
+  background: linear-gradient(180deg, rgba(23, 31, 51, 0.92) 0%, rgba(19, 27, 46, 0.9) 100%);
+  backdrop-filter: blur(14px);
 }
 
 .brand-block h1 {
@@ -32,6 +33,18 @@
   font-weight: 700;
 }
 
+.brand-live {
+  margin-top: 0.95rem;
+  display: inline-flex;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(60, 221, 199, 0.14);
+  color: #85ffef;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
 .app-nav {
   margin-top: 1.5rem;
   display: grid;
@@ -42,22 +55,33 @@
   text-decoration: none;
   border-radius: 10px;
   padding: 0.72rem 0.82rem;
-  color: var(--muted);
+  color: #b6c4e3;
   font-weight: 600;
-  border: 1px solid transparent;
+  border: 1px solid rgba(188, 201, 198, 0.14);
   transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: rgba(34, 42, 61, 0.45);
 }
 
 .nav-link:hover {
-  color: var(--text);
-  background: #f6f8ff;
-  border-color: #e8edff;
+  color: #e7edff;
+  background: rgba(45, 52, 73, 0.82);
+  border-color: rgba(60, 221, 199, 0.34);
 }
 
 .nav-link-active {
-  color: var(--primary);
-  background: var(--primary-soft);
-  border-color: #dbe4ff;
+  color: #c3fff6;
+  background: linear-gradient(135deg, rgba(60, 221, 199, 0.22) 0%, rgba(137, 206, 255, 0.18) 100%);
+  border-color: rgba(60, 221, 199, 0.42);
+}
+
+.nav-icon {
+  width: 1rem;
+  text-align: center;
+  color: #8fe9dd;
+  font-size: 0.76rem;
 }
 
 .app-content {
@@ -87,9 +111,9 @@
 
 .state-banner {
   margin: 0 0 1rem;
-  background: #eef2ff;
-  color: #3730a3;
-  border: 1px solid #dfe6ff;
+  background: rgba(60, 221, 199, 0.12);
+  color: #a5fff3;
+  border: 1px solid rgba(60, 221, 199, 0.28);
   border-radius: 12px;
   padding: 0.76rem 0.92rem;
   font-size: 0.9rem;
@@ -97,15 +121,15 @@
 }
 
 .state-error {
-  background: #fef2f2;
-  color: #b91c1c;
-  border-color: #fee2e2;
+  background: rgba(255, 180, 171, 0.13);
+  color: #ffd3ce;
+  border-color: rgba(255, 180, 171, 0.32);
 }
 
 .state-success {
-  background: #ecfdf3;
-  color: #166534;
-  border-color: #bbf7d0;
+  background: rgba(98, 250, 227, 0.14);
+  color: #b6fff5;
+  border-color: rgba(98, 250, 227, 0.36);
 }
 
 @media (max-width: 980px) {
