@@ -4,6 +4,7 @@ const navigationLinks = [
   { label: 'Overview', path: '/' },
   { label: 'Detection', path: '/upload' },
   { label: 'Inventory', path: '/inventory' },
+  { label: 'Alerts', path: '/alerts' },
 ];
 
 export const AppShell = ({ title, subtitle, actions, children }) => {

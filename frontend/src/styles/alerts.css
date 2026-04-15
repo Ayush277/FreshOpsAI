@@ -1,0 +1,167 @@
+.alerts-summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(160px, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.alerts-summary-card {
+  border-radius: 16px;
+  padding: 0.9rem 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.alerts-summary-card p {
+  margin: 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.alerts-summary-card h3 {
+  margin: 0.3rem 0 0;
+  font-size: 1.5rem;
+}
+
+.alerts-summary-warning {
+  border-color: #fde68a;
+  background: #fffaf0;
+}
+
+.alerts-summary-warning h3 {
+  color: #b45309;
+}
+
+.alerts-summary-danger {
+  border-color: #fecaca;
+  background: #fff4f4;
+}
+
+.alerts-summary-danger h3 {
+  color: #b91c1c;
+}
+
+.alerts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.alert-card {
+  border-radius: 18px;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  box-shadow: var(--shadow-soft);
+}
+
+.alert-card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.alert-status-pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.28rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 800;
+  text-transform: capitalize;
+}
+
+.alert-status-pill-expiring-soon {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.alert-status-pill-expired {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.alert-severity {
+  font-size: 0.74rem;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.alert-card h3 {
+  margin: 0.8rem 0 0;
+  font-size: 1.15rem;
+}
+
+.alert-message {
+  margin: 0.5rem 0 0;
+  color: #334155;
+  line-height: 1.45;
+}
+
+.alert-meta-grid {
+  margin-top: 0.9rem;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.alert-meta-grid div {
+  background: #f8fafc;
+  border-radius: 10px;
+  padding: 0.55rem;
+  border: 1px solid #edf2f7;
+}
+
+.alert-meta-grid span {
+  display: block;
+  font-size: 0.72rem;
+  color: #64748b;
+}
+
+.alert-meta-grid strong {
+  font-size: 0.86rem;
+}
+
+.alert-card-expiring-soon {
+  border-left: 5px solid #f59e0b;
+}
+
+.alert-card-expired {
+  border-left: 5px solid #dc2626;
+}
+
+.alerts-empty-state {
+  border: 2px dashed #dbe5f5;
+  border-radius: 18px;
+  padding: 2rem;
+  background: #fff;
+  text-align: center;
+}
+
+.alerts-empty-state h3 {
+  margin: 0;
+}
+
+.alerts-empty-state p {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+}
+
+@media (max-width: 980px) {
+  .alerts-summary-row {
+    grid-template-columns: 1fr;
+  }
+
+  .alerts-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .alert-meta-grid {
+    grid-template-columns: 1fr;
+  }
+}

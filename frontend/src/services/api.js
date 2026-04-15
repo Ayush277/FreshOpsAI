@@ -30,3 +30,7 @@ export const uploadApi = {
 export const inventoryApi = {
   getAll: () => request('/items'),
 };
+
+export const alertsApi = {
+  getAll: () => request('/alerts'),
+};
