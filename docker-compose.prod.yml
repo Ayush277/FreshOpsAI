@@ -1,0 +1,12 @@
+# Production override for EC2 Deployment
+# Overrides local development ports for standard public internet access
+services:
+  backend:
+    # Ensure backend stays highly available in production
+    restart: always
+
+  frontend:
+    # Map container Nginx port 80 to the host's standard port 80
+    ports:
+      - "80:80"
+    restart: always
