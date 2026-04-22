@@ -1,124 +1,180 @@
-# FreshOps AI
+# FreshOps AI 🌿
 
-FreshOps AI is a smart perishable intelligence platform designed to help food-driven teams make better decisions before inventory becomes waste. It combines image-based item capture, AI-assisted detection, expiry intelligence, and operational dashboards into one practical workflow.
+FreshOps AI is a smart perishable intelligence platform designed to help food-driven teams make better decisions before inventory becomes waste. It combines image-based item capture, AI-assisted detection, an expiry intelligence engine, and operational dashboards into one cohesive workflow.
 
-Whether you are building this for a retail use case, a cloud kitchen, a campus canteen, or a warehouse MVP, the goal is the same: **see risk early, act faster, and reduce avoidable loss**.
-
----
-
-## Problem Statement
-
-Perishable operations are still largely reactive:
-
-- teams discover expired stock too late,
-- visibility across locations is fragmented,
-- and inventory insights are often manual or delayed.
-
-This leads to preventable waste, margin leakage, and inconsistent replenishment decisions.
-
-FreshOps AI addresses this by turning day-to-day inventory signals into real-time, explainable intelligence:
-
-- detect what was added,
-- estimate freshness windows,
-- classify risk states,
-- and surface actionable alerts.
+Whether for a retail use case, a cloud kitchen, a campus canteen, or a warehouse MVP, the goal is the same: **see risk early, act faster, and reduce avoidable loss**.
 
 ---
 
-## End-to-End Flow
+## 🏛️ Architecture Overview
 
-![FreshOps AI End-to-End Flow](docs/assets/freshops-end-to-end-flow.svg)
+FreshOps AI follows a modular, backend-first Microservices/SPA architecture, fully containerized and provisioned via Infrastructure as Code (IaC).
 
-1. User uploads a perishable item image (with optional metadata).
-2. AI service detects the most relevant food/item label.
-3. Expiry engine maps item/category to shelf-life rules.
-4. System stores item record, status, and predicted expiry timeline.
-5. Dashboard and alerts layer surfaces what needs attention now.
+- **Frontend (React/Vite)**: A modern Single Page Application (SPA) dashboard for uploads, inventory views, and business summaries. Served via **Nginx** in production.
+- **Backend (Node.js/Express)**: API orchestration, request validation, AI integration, rule-based expiry logic, and response shaping.
+- **Data & Storage**: **MongoDB Atlas** for structured inventory records and **AWS S3** for persistent image storage.
+- **AI Layer**: **Clarifai** integration to automatically detect and classify food items from uploaded images.
+- **DevOps & Cloud**: **Docker Compose** for orchestration, **Jenkins** for CI/CD automation, and **Terraform** for AWS EC2/S3 infrastructure provisioning.
 
----
+### End-to-End Flow
 
-## Architecture Overview
-
-![FreshOps AI Architecture Overview](docs/assets/freshops-architecture-overview.svg)
-
-FreshOps AI follows a modular, backend-first architecture:
-
-- **Frontend layer** for uploads, inventory views, alerts, and business summaries.
-- **Backend layer** for API orchestration, validation, AI integration, expiry logic, and response shaping.
-- **Data layer** for structured inventory records and image persistence.
-- **Platform layer** for containerization, CI/CD automation, and infrastructure provisioning.
-
-This separation keeps the MVP simple while making it straightforward to scale services independently as usage grows.
+1. **User Uploads**: A user uploads a perishable item image via the React SPA.
+2. **Reverse Proxy**: Nginx routes the `/api` request to the Express backend container.
+3. **Storage & AI**: The backend streams the image to AWS S3 and triggers the Clarifai AI model to classify the food label (e.g., "Apple").
+4. **Expiry Engine**: The AI label is mapped to a broad category ("Fruits") and run through a rule-based engine to predict the expiry date (e.g., 7 days).
+5. **Persistence**: The record (S3 URL, category, expiry timeline, status) is saved in MongoDB.
+6. **Dashboard**: The UI updates in real-time, highlighting `fresh`, `expiring-soon`, and `expired` items, calculating total waste percentage.
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-Current/target stack for this repository:
-
-- **Frontend:** React-based dashboard UI (planned structure under `frontend/`).
-- **Backend:** Node.js + Express REST APIs (planned structure under `backend/`).
-- **Database:** MongoDB Atlas via Mongoose.
-- **AI Layer:** Clarifai-based food label detection integration.
-- **File Storage:** AWS S3 for image persistence.
-- **Containerization:** Docker + Docker Compose for local and deployment parity.
-- **CI/CD:** Jenkins pipeline for build, test, and deploy automation.
-- **Infrastructure:** Terraform for AWS provisioning (EC2, S3, security groups).
+| Category | Technologies |
+| :--- | :--- |
+| **Frontend** | React, Vite, Nginx |
+| **Backend** | Node.js, Express, Mongoose, Multer |
+| **Database** | MongoDB Atlas |
+| **Cloud Storage** | AWS S3 |
+| **AI Integration** | Clarifai API |
+| **Containerization**| Docker, Docker Compose |
+| **Infrastructure** | Terraform (AWS EC2, S3, Security Groups) |
+| **CI/CD** | Jenkins (Pipeline-as-Code) |
 
 ---
 
-## Project Structure
+## 📁 Project Structure
 
 ```text
 FreshOpsAI/
-├── frontend/      # React UI, dashboard, upload flows
-├── backend/       # Express APIs, services, models, expiry logic
-├── docker/        # Dockerfiles, compose, container runtime assets
-├── terraform/     # AWS infrastructure as code
-├── jenkins/       # CI/CD pipeline assets and helpers
-└── docs/          # Architecture, prompts, and project documentation
+├── frontend/      # React UI, Vite build config, Nginx Dockerfile
+├── backend/       # Express APIs, AI services, Expiry logic, S3 integration
+├── docker/        # Docker configurations and local orchestration docs
+├── terraform/     # AWS Infrastructure as Code (EC2, S3, Security Groups)
+├── jenkins/       # CI/CD pipeline assets and remote deployment scripts
+├── docs/          # Deep-dive architecture and end-to-end flow documentation
+├── Jenkinsfile    # Declarative Jenkins pipeline definition
+├── docker-compose.yml       # Local multi-container orchestration
+└── docker-compose.prod.yml  # Production overrides (Port 80, CloudWatch logging)
 ```
 
 ---
 
-## Planned Features
+## ⚙️ Environment Variables Setup
 
-### Core MVP
+Before running the application, you must configure your environment variables. 
+Create a `.env` file in the `backend/` directory (or map it at the root for production) using the provided `.env.example` as a template:
 
-- Image upload pipeline with AI-assisted item detection.
-- Rule-based expiry prediction with status buckets (`fresh`, `expiring-soon`, `expired`).
-- Inventory listing and alert endpoints.
-- Executive-friendly dashboard summary (counts + waste percentage).
+```ini
+# Server Configuration
+PORT=4000
+NODE_ENV=development
 
-### Near-Term Enhancements
+# MongoDB Configuration
+MONGODB_URI=mongodb+srv://<username>:<password>@cluster.mongodb.net/freshops
 
-- Better label-to-category mapping for more accurate expiry inference.
-- Multi-location support and role-based access.
-- Alert subscriptions (email/Slack/WhatsApp) for expiring stock.
-- Trend analytics for waste reduction and procurement planning.
+# Clarifai AI Configuration
+CLARIFAI_PAT=your_personal_access_token_here
 
-### Interview-Ready Direction
-
-- Demonstrate clear domain problem ownership.
-- Show practical AI usage without overengineering.
-- Highlight DevOps maturity: Docker, Jenkins, Terraform, cloud deployment path.
-
----
-
-## Deployment Story
-
-FreshOps AI is designed as a practical MVP that can evolve into production safely:
-
-1. **Build locally** with backend + frontend development flow.
-2. **Containerize services** for consistent runtime behavior.
-3. **Provision infrastructure** on AWS using Terraform.
-4. **Automate CI/CD** through Jenkins pipelines.
-5. **Deploy to EC2** with S3-backed image storage and cloud-friendly logging.
-
-This progression intentionally mirrors how a real product moves from prototype to dependable operations.
+# AWS S3 Configuration
+AWS_REGION=us-east-1
+AWS_ACCESS_KEY_ID=your_aws_access_key
+AWS_SECRET_ACCESS_KEY=your_aws_secret_key
+AWS_S3_BUCKET=freshops-ai-images-bucket
+```
 
 ---
 
-## Why This Project Matters
+## 💻 Local Development (Without Docker)
 
-FreshOps AI is not just a demo app; it is a business-minded engineering project. It combines product thinking, backend system design, applied AI integration, and deployment discipline in one cohesive platform that is easy to discuss in GitHub reviews and technical interviews.
+If you wish to develop without containers, you will need Node.js (v20+) installed.
+
+**1. Start the Backend:**
+\`\`\`bash
+cd backend
+npm install
+npm run dev
+# The API will be available at http://localhost:4000
+\`\`\`
+
+**2. Start the Frontend:**
+\`\`\`bash
+cd frontend
+npm install
+npm run dev
+# The Vite SPA will be available at http://localhost:5173
+\`\`\`
+
+*Note: The frontend Vite config automatically proxies `/api` requests to `http://localhost:4000`.*
+
+---
+
+## 🐳 Running with Docker (Recommended)
+
+To guarantee parity with production, run the entire stack locally using Docker Compose.
+
+```bash
+# Build and start the containers in detached mode
+docker compose up --build -d
+
+# View logs to ensure services started correctly
+docker compose logs -f
+```
+
+- **Frontend**: Available at `http://localhost:8080`
+- **Backend API**: Available at `http://localhost:4000`
+
+To tear down the environment:
+```bash
+docker compose down -v
+```
+
+---
+
+## ☁️ AWS Deployment & Terraform
+
+We use **Terraform** to provision the cloud infrastructure. 
+
+1. Install Terraform and configure your AWS CLI credentials.
+2. Provision the MVP Infrastructure:
+   ```bash
+   cd terraform
+   terraform init
+   terraform apply
+   ```
+3. Terraform will provision:
+   - A single **Ubuntu EC2 Instance** (with a 20GB EBS volume).
+   - An **AWS S3 Bucket** with Public Read policies (for image uploads).
+   - **Security Groups** opening ports `22` (SSH), `80` (HTTP), and `4000` (API).
+4. Terraform will output the `ec2_public_ip` and `s3_bucket_name`. Use these to configure your Jenkins pipeline and `.env` file.
+
+*See `docs/aws-ec2-deployment.md` for detailed EC2 setup instructions.*
+
+---
+
+## 🚀 CI/CD with Jenkins
+
+FreshOps AI is equipped with a production-ready declarative **Jenkinsfile**.
+
+### Pipeline Stages:
+1. **Checkout**: Pulls the latest code from GitHub.
+2. **Build**: Compiles both `backend` and `frontend` Docker images.
+3. **Test**: Executes unit testing suites (Optional/Extensible).
+4. **Deploy**: Securely SSHes into the provisioned EC2 instance using `./jenkins/deploy.sh` and deploys the new images using `docker compose` with the production overrides (`docker-compose.prod.yml`).
+
+### Production Overrides:
+The deployment utilizes `docker-compose.prod.yml` which:
+- Maps the frontend to the native host port `80`.
+- Configures `restart: always` for high availability.
+- (Optional) Configures the Docker `awslogs` driver to stream structured JSON backend logs directly to **AWS CloudWatch**.
+
+---
+
+## 🔮 Future Enhancements
+
+- **Push Notifications**: Integrate AWS SNS or SendGrid to send Slack/Email alerts for items marked `expiring-soon`.
+- **Advanced AI Tuning**: Use Clarifai's custom models to train specific catalog recognition for niche warehouses.
+- **Multi-Tenant Support**: Implement role-based access control (RBAC) and location-tagging for enterprise scale.
+
+---
+
+> **Note for Recruiters/Interviewers**: This repository was built incrementally to demonstrate a deep understanding of full-stack engineering, from core application logic and AI integration to container orchestration and automated cloud deployments. Check out the `docs/` folder for deeper architectural walkthroughs.
