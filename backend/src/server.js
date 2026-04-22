@@ -5,6 +5,25 @@ const { getClarifaiDiagnostics } = require('./config/clarifai.config');
 const { getAwsDiagnostics } = require('./config/aws.config');
 const { logger } = require('./utils/logger');
 
+// Handle uncaught exceptions and rejections gracefully
+process.on('unhandledRejection', (reason, promise) => {
+  logger.error('Unhandled Rejection encountered', {
+    event: 'process.unhandledRejection',
+    reason: reason.message || reason,
+    stack: reason.stack
+  });
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error) => {
+  logger.error('Uncaught Exception encountered', {
+    event: 'process.uncaughtException',
+    error: error.message,
+    stack: error.stack
+  });
+  process.exit(1);
+});
+
 const logStartupDiagnostics = () => {
   const mongoDiagnostics = getMongoDiagnostics();
   const clarifaiDiagnostics = getClarifaiDiagnostics();
