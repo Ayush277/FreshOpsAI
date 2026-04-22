@@ -36,13 +36,13 @@ scp -i "$SSH_KEY_PATH" $SSH_ARGS \
 
 # 3. SSH into the instance to execute the deployment
 echo "🚢 Pulling and restarting containers on the host..."
-ssh -i "$SSH_KEY_PATH" $SSH_ARGS "${EC2_USER}@${EC2_HOST}" << 'EOF'
+ssh -i "$SSH_KEY_PATH" $SSH_ARGS "${EC2_USER}@${EC2_HOST}" << EOF
     # Exit if any command on the remote server fails
     set -e
 
     cd ~/freshops-ai-deploy
 
-    # NOTE: Assuming the `.env` file containing AWS / DB secrets is securely 
+    # NOTE: Assuming the \`.env\` file containing AWS / DB secrets is securely 
     # maintained on the EC2 host at ~/freshops-ai-deploy/.env
     if [ ! -f .env ]; then
         echo "⚠️ Warning: .env file not found in the deployment directory!"
@@ -53,6 +53,10 @@ ssh -i "$SSH_KEY_PATH" $SSH_ARGS "${EC2_USER}@${EC2_HOST}" << 'EOF'
     # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
 
     echo "⬇️ Pulling latest images..."
+    # Export specific image vars so compose picks them up if deployed via Jenkins
+    export BACKEND_IMAGE="${LATEST_BACKEND:-freshops-backend:latest}"
+    export FRONTEND_IMAGE="${LATEST_FRONTEND:-freshops-frontend:latest}"
+
     # Suppress warnings if local image builds weren't pushed during testing
     docker compose -f docker-compose.yml -f docker-compose.prod.yml pull || true
 

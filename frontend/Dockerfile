@@ -28,7 +28,7 @@ RUN rm -rf /usr/share/nginx/html/*
 # Copy built assets from the builder stage
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
 
-# Handle React Router fallback (SPA subpaths)
+# Handle React Router fallback (SPA subpaths) and API proxying
 RUN echo 'server { \
     listen 80; \
     server_name localhost; \
@@ -36,6 +36,14 @@ RUN echo 'server { \
         root /usr/share/nginx/html; \
         index index.html index.htm; \
         try_files $uri $uri/ /index.html; \
+    } \
+    location /api/ { \
+        proxy_pass http://backend:4000/; \
+        proxy_http_version 1.1; \
+        proxy_set_header Upgrade $http_upgrade; \
+        proxy_set_header Connection "upgrade"; \
+        proxy_set_header Host $host; \
+        proxy_cache_bypass $http_upgrade; \
     } \
 }' > /etc/nginx/conf.d/default.conf
 

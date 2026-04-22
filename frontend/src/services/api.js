@@ -1,4 +1,7 @@
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000';
+// Use relative /api path which Nginx will proxy to the backend container 
+// When running locally with Vite dev server against local backend, 
+// either vite.config.js proxy handles it, or VITE_API_BASE_URL specifies the local full URL.
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
 const request = async (path, options = {}) => {
   const response = await fetch(`${API_BASE_URL}${path}`, {
