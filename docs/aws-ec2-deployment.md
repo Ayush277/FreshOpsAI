@@ -101,3 +101,27 @@ docker compose ps
 docker compose logs -f backend
 ```
 You can now access your application from your browser at `http://<ec2-public-ip>`.
+
+## Log Management & CloudWatch
+
+The backend has been configured to emit structured JSON logs to standard output. This makes application monitoring inherently cloud-native and highly searchable. For an MVP, managing and tracing these logs remains straightforward.
+
+### Standard Container Logs
+By default, Docker stores logs locally on the EC2 instance. You can search these logs directly using bash tools:
+```bash
+# View backend logs in real-time
+docker compose logs -f backend
+
+# Search for errors only inside the JSON structure:
+docker compose logs backend | grep '"level":"error"'
+```
+
+### Exporting to AWS CloudWatch Logs
+When ready to view logs inside the AWS Management Console (CloudWatch):
+1. **Assign an IAM Role**: Attach an IAM Role with `CloudWatchLogsFullAccess` (or specifically `logs:CreateLogStream` and `logs:PutLogEvents`) to your EC2 instance.
+2. **Update Configuration**: Open `docker-compose.prod.yml` and uncomment the `logging` block for the `backend` service.
+3. **Restart the Stack**:
+```bash
+docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate
+```
+Once enabled, logs automatically stream directly into the `/freshops-ai/backend` log group inside AWS CloudWatch.

@@ -4,6 +4,15 @@ services:
   backend:
     # Ensure backend stays highly available in production
     restart: always
+    # IMPORTANT: The backend natively outputs structured JSON to standard out.
+    # To stream logs directly to AWS CloudWatch instead of keeping them local, uncomment the following block
+    # and ensure your EC2 instance has an IAM role with CloudWatch Logs write access (logs:PutLogEvents).
+    # logging:
+    #   driver: awslogs
+    #   options:
+    #     awslogs-region: ${AWS_REGION}
+    #     awslogs-group: /freshops-ai/backend
+    #     awslogs-create-group: "true"
 
   frontend:
     # Map container Nginx port 80 to the host's standard port 80
