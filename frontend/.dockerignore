@@ -1,0 +1,21 @@
+node_modules/
+npm-debug.log
+.DS_Store
+
+# Temporary outputs
+dist/
+dist-ssr/
+coverage/
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Git and tooling
+.git/
+.gitignore
+
+# Other docs
+README.md
+docs/

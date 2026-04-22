@@ -1,0 +1,30 @@
+name: freshops-ai
+
+services:
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: freshops-backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      # If your frontend requires an API URL embedded at build time, 
+      # you can pass it via build args here:
+      # args:
+      #   VITE_API_URL: http://localhost:4000
+    container_name: freshops-frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
