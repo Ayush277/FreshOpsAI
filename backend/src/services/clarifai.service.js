@@ -1,11 +1,8 @@
-const fs = require('fs/promises');
-const { env } = require('../config/env');
-
-const CLARIFAI_API_BASE_URL = 'https://api.clarifai.com/v2/models';
-
-const isClarifaiConfigured = () => {
-  return Boolean(env.clarifaiPat && env.clarifaiUserId && env.clarifaiAppId && env.clarifaiModelId);
-};
+const {
+  clarifaiConfig,
+  isClarifaiConfigured,
+} = require('../config/clarifai.config');
+const { logger } = require('../utils/logger');
 
 const extractTopConcept = (responseJson) => {
   const outputs = responseJson?.outputs || [];
@@ -25,9 +22,8 @@ const extractTopConcept = (responseJson) => {
   };
 };
 
-const buildClarifaiInput = async ({ imageUrl, filePath }) => {
-  if (filePath) {
-    const fileBuffer = await fs.readFile(filePath);
+const buildClarifaiInput = async ({ imageUrl, fileBuffer }) => {
+  if (fileBuffer) {
     return {
       data: {
         image: {
@@ -50,8 +46,13 @@ const buildClarifaiInput = async ({ imageUrl, filePath }) => {
   return null;
 };
 
-const detectFoodLabel = async ({ imageUrl, filePath }) => {
+const detectFoodLabel = async ({ imageUrl, fileBuffer }) => {
   if (!isClarifaiConfigured()) {
+    logger.warn('Clarifai detection skipped: configuration missing', {
+      event: 'clarifai.detection.skipped.config-missing',
+      configured: false,
+    });
+
     return {
       success: false,
       skipped: true,
@@ -60,9 +61,13 @@ const detectFoodLabel = async ({ imageUrl, filePath }) => {
   }
 
   try {
-    const input = await buildClarifaiInput({ imageUrl, filePath });
+    const input = await buildClarifaiInput({ imageUrl, fileBuffer });
 
     if (!input) {
+      logger.warn('Clarifai detection skipped: no image source', {
+        event: 'clarifai.detection.skipped.no-image-source',
+      });
+
       return {
         success: false,
         skipped: true,
@@ -70,16 +75,16 @@ const detectFoodLabel = async ({ imageUrl, filePath }) => {
       };
     }
 
-    const response = await fetch(`${CLARIFAI_API_BASE_URL}/${env.clarifaiModelId}/outputs`, {
+    const response = await fetch(`${clarifaiConfig.apiBaseUrl}/${clarifaiConfig.modelId}/outputs`, {
       method: 'POST',
       headers: {
-        Authorization: `Key ${env.clarifaiPat}`,
+        Authorization: `Key ${clarifaiConfig.pat}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
         user_app_id: {
-          user_id: env.clarifaiUserId,
-          app_id: env.clarifaiAppId,
+          user_id: clarifaiConfig.userId,
+          app_id: clarifaiConfig.appId,
         },
         inputs: [input],
       }),
@@ -87,6 +92,12 @@ const detectFoodLabel = async ({ imageUrl, filePath }) => {
 
     if (!response.ok) {
       const apiError = await response.text();
+
+      logger.warn('Clarifai request failed', {
+        event: 'clarifai.detection.failed.response',
+        statusCode: response.status,
+      });
+
       return {
         success: false,
         skipped: false,
@@ -99,12 +110,22 @@ const detectFoodLabel = async ({ imageUrl, filePath }) => {
     const topConcept = extractTopConcept(responseJson);
 
     if (!topConcept?.label) {
+      logger.warn('Clarifai did not return a detectable concept', {
+        event: 'clarifai.detection.failed.no-concept',
+      });
+
       return {
         success: false,
         skipped: false,
         reason: 'Clarifai did not return a detectable food label.',
       };
     }
+
+    logger.info('Clarifai detection succeeded', {
+      event: 'clarifai.detection.succeeded',
+      label: topConcept.label,
+      confidence: topConcept.confidence,
+    });
 
     return {
       success: true,
@@ -113,6 +134,11 @@ const detectFoodLabel = async ({ imageUrl, filePath }) => {
       confidence: topConcept.confidence,
     };
   } catch (error) {
+    logger.error('Clarifai detection failed unexpectedly', {
+      event: 'clarifai.detection.failed.unexpected',
+      error: error.message,
+    });
+
     return {
       success: false,
       skipped: false,

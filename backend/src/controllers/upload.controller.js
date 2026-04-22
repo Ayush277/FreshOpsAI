@@ -1,5 +1,6 @@
 const { uploadService } = require('../services/upload.service');
 const { detectFoodLabel } = require('../services/clarifai.service');
+const { uploadImageToS3 } = require('../services/s3.service');
 const { sendSuccess } = require('../utils/api-response');
 const { AppError } = require('../utils/app-error');
 
@@ -9,11 +10,17 @@ const postUpload = async (request, response, next) => {
       request.validatedBody;
 
     const uploadedFile = request.file;
-    const fileUrl = uploadedFile ? `/uploads/${uploadedFile.filename}` : imageUrl;
+    let fileUrl = imageUrl;
+    let s3UploadResult = null;
+
+    if (uploadedFile) {
+      s3UploadResult = await uploadImageToS3(uploadedFile);
+      fileUrl = s3UploadResult.url;
+    }
 
     const aiDetection = await detectFoodLabel({
-      imageUrl,
-      filePath: uploadedFile?.path,
+      imageUrl: imageUrl || fileUrl,
+      fileBuffer: uploadedFile?.buffer,
     });
 
     const resolvedItemName = aiDetection.success ? aiDetection.label : itemName;
@@ -53,8 +60,10 @@ const postUpload = async (request, response, next) => {
               originalName: uploadedFile.originalname,
               mimeType: uploadedFile.mimetype,
               size: uploadedFile.size,
-              filename: uploadedFile.filename,
-              path: fileUrl,
+              storage: 's3',
+              bucket: s3UploadResult?.bucket || null,
+              key: s3UploadResult?.key || null,
+              url: fileUrl,
             }
           : null,
         aiDetection: {

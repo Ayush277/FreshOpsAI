@@ -1,27 +1,29 @@
 const mongoose = require('mongoose');
-const { env } = require('./env');
-
-const mongoUri = process.env.MONGODB_URI;
-
-const validateMongoConnection = () => {
-  if (!mongoUri) {
-    const error = new Error(
-      'MONGODB_URI environment variable is not set. Please configure it before starting the application.'
-    );
-    error.statusCode = 500;
-    throw error;
-  }
-};
+const { mongoConfig, validateMongoConfig } = require('./mongo.config');
+const { logger } = require('../utils/logger');
 
 const connectDatabase = async () => {
   try {
-    validateMongoConnection();
+    validateMongoConfig();
 
-    await mongoose.connect(mongoUri);
+    await mongoose.connect(mongoConfig.uri);
 
-    console.log('MongoDB connection established successfully');
+    logger.info('MongoDB connection established successfully', {
+      event: 'mongodb.connection.succeeded',
+    });
   } catch (error) {
-    console.error('MongoDB connection failed:', error.message);
+    logger.error('MongoDB connection failed', {
+      event: 'mongodb.connection.failed',
+      error: error.message,
+    });
+
+    if (/querySrv|ENOTFOUND|timed out/i.test(error.message || '')) {
+      logger.warn('MongoDB connectivity diagnostics hint', {
+        event: 'mongodb.connection.hint',
+        hint: 'Check Atlas Network Access allowlist, DNS resolution, and outbound firewall rules for port 27017.',
+      });
+    }
+
     process.exit(1);
   }
 };
@@ -29,14 +31,19 @@ const connectDatabase = async () => {
 const disconnectDatabase = async () => {
   try {
     await mongoose.disconnect();
-    console.log('MongoDB connection closed');
+    logger.info('MongoDB connection closed', {
+      event: 'mongodb.connection.closed',
+    });
   } catch (error) {
-    console.error('Error disconnecting MongoDB:', error.message);
+    logger.error('Error disconnecting MongoDB', {
+      event: 'mongodb.disconnection.failed',
+      error: error.message,
+    });
   }
 };
 
 module.exports = {
   connectDatabase,
   disconnectDatabase,
-  validateMongoConnection,
+  validateMongoConfig,
 };
