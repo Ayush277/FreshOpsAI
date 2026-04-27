@@ -1,0 +1,32 @@
+{
+  "ServiceName": "freshops-backend",
+  "SourceConfiguration": {
+    "ImageRepository": {
+      "ImageRepositoryType": "ECR",
+      "ImageIdentifier": "424503481505.dkr.ecr.us-east-1.amazonaws.com/freshops-backend:latest",
+      "RepositoryCredentials": {
+        "CredentialsProviderType": "AWSSECRETS_MANAGER",
+        "Secrets": {}
+      }
+    },
+    "AutoDeploymentsEnabled": true
+  },
+  "InstanceConfiguration": {
+    "Cpu": "0.5 vCPU",
+    "Memory": "1 GB",
+    "InstanceRoleArn": ""
+  },
+  "NetworkConfiguration": {
+    "EgressConfiguration": {
+      "EgressType": "DEFAULT"
+    }
+  },
+  "HealthCheckConfiguration": {
+    "Protocol": "HTTP",
+    "Path": "/health",
+    "Interval": 10,
+    "Timeout": 5,
+    "HealthyThreshold": 1,
+    "UnhealthyThreshold": 5
+  }
+}
