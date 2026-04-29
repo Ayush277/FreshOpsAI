@@ -60,6 +60,43 @@
   font-size: 0.88rem;
 }
 
+.live-status-group {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.live-status,
+.live-chart-badge,
+.refresh-countdown {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 800;
+}
+
+.live-status,
+.live-chart-badge {
+  background: rgba(98, 250, 227, 0.12);
+  color: #b6fff5;
+  border: 1px solid rgba(98, 250, 227, 0.3);
+}
+
+.refresh-countdown {
+  background: rgba(137, 206, 255, 0.12);
+  color: #b9d7ff;
+  border: 1px solid rgba(137, 206, 255, 0.22);
+}
+
+.live-pulse {
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -156,6 +193,68 @@
   box-shadow: var(--shadow-soft);
 }
 
+.live-chart-panel {
+  border: 1px solid rgba(137, 206, 255, 0.22);
+  border-radius: 18px;
+  background: linear-gradient(130deg, rgba(19, 27, 46, 0.94) 0%, rgba(28, 37, 59, 0.9) 100%);
+  padding: 1rem 1.15rem 1.1rem;
+  box-shadow: var(--shadow-soft);
+}
+
+.live-chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 0.9rem;
+}
+
+.live-chart-header h4 {
+  margin: 0.25rem 0 0;
+}
+
+.freshness-chart {
+  display: grid;
+  gap: 0.8rem;
+}
+
+.freshness-chart-row {
+  display: grid;
+  grid-template-columns: 92px 1fr 42px;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.freshness-chart-label,
+.freshness-chart-value {
+  font-size: 0.82rem;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.freshness-chart-track {
+  height: 12px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.freshness-chart-fill {
+  height: 100%;
+  border-radius: inherit;
+  transition: width 0.4s ease;
+}
+
+.freshness-fresh .freshness-chart-fill { background: linear-gradient(90deg, rgba(98, 250, 227, 0.9), rgba(54, 191, 170, 0.92)); }
+.freshness-warning .freshness-chart-fill { background: linear-gradient(90deg, rgba(255, 187, 87, 0.95), rgba(255, 152, 0, 0.9)); }
+.freshness-danger .freshness-chart-fill { background: linear-gradient(90deg, rgba(255, 99, 132, 0.95), rgba(224, 60, 90, 0.9)); }
+
+@keyframes livePulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
 .kpi-label {
   margin: 0;
   font-size: 0.75rem;
@@ -243,5 +342,13 @@
 
   .kpi-breakdown {
     grid-template-columns: 1fr;
+  }
+
+  .live-status-group {
+    justify-content: flex-start;
+  }
+
+  .freshness-chart-row {
+    grid-template-columns: 72px 1fr 28px;
   }
 }

@@ -1,4 +1,4 @@
-const { getItemsService } = require('../services/items.service');
+const { deleteItemService, getItemsService } = require('../services/items.service');
 const { sendSuccess } = require('../utils/api-response');
 
 const getItems = async (request, response, next) => {
@@ -17,4 +17,17 @@ const getItems = async (request, response, next) => {
   }
 };
 
-module.exports = { getItems };
+const deleteItem = async (request, response, next) => {
+  try {
+    const deletedItem = await deleteItemService(request.params.id);
+
+    return sendSuccess(response, {
+      message: 'Item removed successfully',
+      data: deletedItem,
+    });
+  } catch (error) {
+    return next(error);
+  }
+};
+
+module.exports = { deleteItem, getItems };

@@ -9,6 +9,28 @@
   box-shadow: var(--shadow-soft);
 }
 
+.inventory-timer {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin-top: 0.65rem !important;
+  padding: 0.3rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(98, 250, 227, 0.12);
+  color: #b6fff5;
+  border: 1px solid rgba(98, 250, 227, 0.24);
+  width: fit-content;
+}
+
+.live-pulse {
+  animation: livePulse 1.2s ease-in-out infinite;
+}
+
+@keyframes livePulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.03); }
+}
+
 .inventory-table-container {
   background: linear-gradient(150deg, rgba(23, 31, 51, 0.88) 0%, rgba(19, 27, 46, 0.92) 100%);
   border: 1px solid var(--border);
@@ -40,6 +62,11 @@
   font-size: 0.9rem;
   border-bottom: 1px solid rgba(188, 201, 198, 0.1);
   vertical-align: middle;
+}
+
+.inventory-table th:last-child,
+.inventory-table td:last-child {
+  text-align: right;
 }
 
 .inventory-table tr:hover {
@@ -97,8 +124,8 @@
 }
 
 .status-expired {
-  background: rgba(116, 183, 177, 0.24);
-  color: #dcfffb;
+  background: rgba(255, 99, 132, 0.22);
+  color: #ffd1dc;
 }
 
 .days-badge {
@@ -108,6 +135,40 @@
 
 .days-badge.urgent {
   color: #9dfff4;
+}
+
+.days-badge.expired {
+  color: #ff8fa3;
+}
+
+.inventory-row-expired {
+  background: rgba(255, 99, 132, 0.08);
+}
+
+.inventory-row-expired:hover {
+  background: rgba(255, 99, 132, 0.12);
+}
+
+.delete-item-button {
+  padding: 0.45rem 0.8rem;
+  border: 1px solid rgba(255, 99, 132, 0.36);
+  background: rgba(255, 99, 132, 0.12);
+  color: #ffd1dc;
+  border-radius: 10px;
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.delete-item-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  background: rgba(255, 99, 132, 0.2);
+}
+
+.delete-item-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 .date-cell {

@@ -11,7 +11,7 @@ echo ""
 # Configuration
 AWS_REGION="us-east-1"
 INSTANCE_TYPE="t3.micro"
-KEY_PAIR_NAME="freshops-key-$(date +%s)"
+KEY_PAIR_NAME="${KEY_PAIR_NAME:-}"
 SECURITY_GROUP_NAME="freshops-sg"
 APP_NAME="freshops-ai"
 KEY_PATH="$HOME/.ssh/$KEY_PAIR_NAME.pem"
@@ -20,36 +20,59 @@ AWS_ACCESS_KEY_ID_VALUE=$(aws configure get aws_access_key_id)
 AWS_SECRET_ACCESS_KEY_VALUE=$(aws configure get aws_secret_access_key)
 MONGODB_URI_VALUE="mongodb+srv://freshopsuser:Freshops%40123@freshopsai.nhm0bv1.mongodb.net/freshops-ai?retryWrites=true&w=majority"
 
-# Step 1: Create EC2 Key Pair
-echo "[1/7] Creating EC2 Key Pair..."
-if aws ec2 create-key-pair \
-  --key-name $KEY_PAIR_NAME \
-  --region $AWS_REGION \
-  --query 'KeyMaterial' \
-  --output text > "$KEY_PATH" 2>/dev/null; then
-  chmod 400 "$KEY_PATH"
-else
-  echo "Key pair may already exist"
-  if [ -f "$KEY_PATH" ]; then
-    chmod 400 "$KEY_PATH"
-  else
-    echo "Warning: $KEY_PATH not found (cannot SSH without private key file)."
-  fi
+if [ -f "backend/.env" ]; then
+  set -a
+  . backend/.env
+  set +a
 fi
 
-# Step 2: Create Security Group
-echo "[2/7] Creating Security Group..."
-SECURITY_GROUP_ID=$(aws ec2 create-security-group \
-  --group-name $SECURITY_GROUP_NAME \
-  --description "Security group for FreshOps AI" \
-  --region $AWS_REGION \
-  --query 'GroupId' \
-  --output text 2>/dev/null) || \
-SECURITY_GROUP_ID=$(aws ec2 describe-security-groups \
-  --filters Name=group-name,Values=$SECURITY_GROUP_NAME \
-  --region $AWS_REGION \
-  --query 'SecurityGroups[0].GroupId' \
-  --output text)
+CLARIFAI_PAT_VALUE="${CLARIFAI_PAT:-}"
+CLARIFAI_USER_ID_VALUE="${CLARIFAI_USER_ID:-}"
+CLARIFAI_APP_ID_VALUE="${CLARIFAI_APP_ID:-}"
+CLARIFAI_MODEL_ID_VALUE="${CLARIFAI_MODEL_ID:-food-item-recognition}"
+
+SECURITY_GROUP_ID="${SECURITY_GROUP_ID:-}"
+if [ -z "$SECURITY_GROUP_ID" ] && [ -f "terraform/terraform.tfstate" ]; then
+  SECURITY_GROUP_ID=$(awk '
+    /"type": "aws_security_group"/ { in_sg=1 }
+    in_sg && /"name": "app_sg"/ { in_app=1 }
+    in_sg && in_app && /"id": "sg-/ {
+      match($0, /sg-[a-z0-9]+/)
+      print substr($0, RSTART, RLENGTH)
+      exit
+    }
+  ' terraform/terraform.tfstate)
+fi
+
+if [ -z "$KEY_PAIR_NAME" ] && [ -f "terraform/terraform.tfstate" ]; then
+  KEY_PAIR_NAME=$(awk '/"key_name":/ { gsub(/[",]/, "", $2); print $2; exit }' terraform/terraform.tfstate)
+fi
+
+if [ -z "$KEY_PAIR_NAME" ]; then
+  KEY_PAIR_NAME="freshops-ai-key"
+fi
+
+KEY_PATH="$HOME/.ssh/$KEY_PAIR_NAME.pem"
+
+# Step 1: Select EC2 Key Pair
+echo "[1/7] Selecting EC2 Key Pair..."
+if [ -f "$KEY_PATH" ]; then
+  chmod 400 "$KEY_PATH"
+else
+  echo "Using existing key pair name: $KEY_PAIR_NAME"
+  echo "Warning: $KEY_PATH not found (SSH access will require the matching private key)."
+fi
+
+# Step 2: Select Security Group
+echo "[2/7] Selecting Security Group..."
+if [ -z "$SECURITY_GROUP_ID" ]; then
+  SECURITY_GROUP_ID=$(aws ec2 create-security-group \
+    --group-name $SECURITY_GROUP_NAME \
+    --description "Security group for FreshOps AI" \
+    --region $AWS_REGION \
+    --query 'GroupId' \
+    --output text)
+fi
 
 echo "Security Group ID: $SECURITY_GROUP_ID"
 
@@ -131,6 +154,10 @@ services:
       AWS_S3_BUCKET: "freshops-ai-images-ayush-20260427"
       AWS_S3_REGION: "us-east-1"
       AWS_S3_PREFIX: "freshops/uploads"
+      CLARIFAI_PAT: "$CLARIFAI_PAT_VALUE"
+      CLARIFAI_USER_ID: "$CLARIFAI_USER_ID_VALUE"
+      CLARIFAI_APP_ID: "$CLARIFAI_APP_ID_VALUE"
+      CLARIFAI_MODEL_ID: "$CLARIFAI_MODEL_ID_VALUE"
       NODE_ENV: "production"
 
   frontend:

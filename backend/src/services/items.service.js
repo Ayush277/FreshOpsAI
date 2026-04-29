@@ -1,4 +1,5 @@
 const InventoryItem = require('../models/inventory-item.model');
+const { AppError } = require('../utils/app-error');
 
 const MS_PER_DAY = 1000 * 60 * 60 * 24;
 
@@ -54,4 +55,17 @@ const getItemsService = async () => {
   return normalizedItems;
 };
 
-module.exports = { getItemsService };
+const deleteItemService = async (itemId) => {
+  const deletedItem = await InventoryItem.findByIdAndDelete(itemId);
+
+  if (!deletedItem) {
+    throw new AppError('Inventory item not found', 404);
+  }
+
+  return {
+    id: deletedItem._id,
+    itemName: deletedItem.itemName,
+  };
+};
+
+module.exports = { getItemsService, deleteItemService };

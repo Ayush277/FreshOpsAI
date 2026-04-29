@@ -32,6 +32,10 @@ export const uploadApi = {
 
 export const inventoryApi = {
   getAll: () => request('/items'),
+  deleteById: (id) =>
+    request(`/items/${id}`, {
+      method: 'DELETE',
+    }),
 };
 
 export const alertsApi = {

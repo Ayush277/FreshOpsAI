@@ -3,7 +3,7 @@ import { useDashboardSummary } from '../../hooks/useDashboardSummary';
 import { SummaryCard } from './SummaryCard';
 
 export const ExecutiveSummary = () => {
-  const { summary, loading, error, refreshSummary } = useDashboardSummary();
+  const { summary, loading, error, refreshSummary, secondsUntilRefresh } = useDashboardSummary();
 
   const cards = useMemo(
     () => [
@@ -40,6 +40,14 @@ export const ExecutiveSummary = () => {
     ? Math.round((((summary?.expiredItems ?? 0) + (summary?.expiringSoonItems ?? 0)) / (summary?.totalItems ?? 0)) * 100)
     : 0;
 
+  const freshnessBars = [
+    { label: 'Fresh', value: summary?.freshItems ?? 0, tone: 'fresh' },
+    { label: 'Expiring', value: summary?.expiringSoonItems ?? 0, tone: 'warning' },
+    { label: 'Expired', value: summary?.expiredItems ?? 0, tone: 'danger' },
+  ];
+
+  const peakValue = Math.max(...freshnessBars.map((bar) => bar.value), 1);
+
   return (
     <section className="executive-summary">
       <header className="executive-summary-header">
@@ -48,7 +56,11 @@ export const ExecutiveSummary = () => {
           <h3>Inventory Risk and Freshness Performance</h3>
           <p>Decision-grade KPI surface powered by live shelf-life calculations.</p>
         </div>
-        <button onClick={refreshSummary}>Refresh Data</button>
+        <div className="live-status-group">
+          <span className="live-status live-pulse">Live</span>
+          <span className="refresh-countdown">Refresh in {secondsUntilRefresh}s</span>
+          <button onClick={refreshSummary}>Refresh Data</button>
+        </div>
       </header>
 
       {loading ? <p className="state-banner">Loading executive metrics...</p> : null}
@@ -92,6 +104,32 @@ export const ExecutiveSummary = () => {
           </div>
         </div>
       </article>
+
+      <section className="live-chart-panel">
+        <div className="live-chart-header">
+          <div>
+            <p className="kpi-label">Live freshness chart</p>
+            <h4>Inventory mix by status</h4>
+          </div>
+          <span className="live-chart-badge live-pulse">Reading live</span>
+        </div>
+
+        <div className="freshness-chart">
+          {freshnessBars.map((bar) => {
+            const width = `${Math.max((bar.value / peakValue) * 100, bar.value > 0 ? 12 : 6)}%`;
+
+            return (
+              <div key={bar.label} className={`freshness-chart-row freshness-${bar.tone}`}>
+                <div className="freshness-chart-label">{bar.label}</div>
+                <div className="freshness-chart-track">
+                  <div className="freshness-chart-fill" style={{ width }} />
+                </div>
+                <div className="freshness-chart-value">{bar.value}</div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
     </section>
   );
 };
