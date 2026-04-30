@@ -1,0 +1,247 @@
+name: Build & Deploy to AWS
+
+on:
+  push:
+    branches:
+      - main
+
+env:
+  AWS_REGION: us-east-1
+  ECR_REGISTRY: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.us-east-1.amazonaws.com
+  FRONTEND_IMAGE_NAME: freshops-frontend
+  BACKEND_IMAGE_NAME: freshops-backend
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      frontend-image: ${{ steps.image.outputs.frontend }}
+      backend-image: ${{ steps.image.outputs.backend }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+
+      - name: Build frontend image
+        run: |
+          cd frontend
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest .
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest
+          echo "frontend_image=${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest" >> $GITHUB_ENV
+
+      - name: Build backend image
+        run: |
+          cd backend
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest .
+          docker push ${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest
+          echo "backend_image=${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest" >> $GITHUB_ENV
+
+      - name: Output image URLs
+        id: image
+        run: |
+          echo "frontend=${{ env.ECR_REGISTRY }}/${{ env.FRONTEND_IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+          echo "backend=${{ env.ECR_REGISTRY }}/${{ env.BACKEND_IMAGE_NAME }}:latest" >> $GITHUB_OUTPUT
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    if: success()
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::${{ secrets.AWS_ACCOUNT_ID }}:role/GitHubActionsRole
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Get or create EC2 instance
+        id: ec2
+        run: |
+          # Check if instance exists and is running
+          INSTANCE_ID=$(aws ec2 describe-instances \
+            --filters "Name=tag:Project,Values=FreshOpsAI" "Name=instance-state-name,Values=running" \
+            --query 'Reservations[0].Instances[0].InstanceId' \
+            --output text)
+          
+          if [ "$INSTANCE_ID" = "None" ] || [ -z "$INSTANCE_ID" ]; then
+            echo "No running instance found. Launching new instance..."
+            
+            # Launch new EC2 instance
+            RESPONSE=$(aws ec2 run-instances \
+              --image-id ami-0c02fb55956c7d316 \
+              --instance-type t3.micro \
+              --key-name freshops-ai-key \
+              --security-group-ids sg-09fff3dbe465e1cc9 \
+              --tag-specifications 'ResourceType=instance,Tags=[{Key=Project,Value=FreshOpsAI},{Key=Name,Value=FreshOpsAI-Instance}]' \
+              --output json)
+            
+            INSTANCE_ID=$(echo $RESPONSE | jq -r '.Instances[0].InstanceId')
+            echo "Launched instance: $INSTANCE_ID"
+            
+            # Wait for instance to be running
+            aws ec2 wait instance-running --instance-ids $INSTANCE_ID
+            sleep 30
+          else
+            echo "Using existing instance: $INSTANCE_ID"
+          fi
+          
+          # Get public IP
+          PUBLIC_IP=$(aws ec2 describe-instances \
+            --instance-ids $INSTANCE_ID \
+            --query 'Reservations[0].Instances[0].PublicIpAddress' \
+            --output text)
+          
+          echo "instance_id=$INSTANCE_ID" >> $GITHUB_OUTPUT
+          echo "public_ip=$PUBLIC_IP" >> $GITHUB_OUTPUT
+
+      - name: Deploy to EC2
+        run: |
+          # Install deployment script dependencies
+          cat > /tmp/deploy.sh << 'EOF'
+          #!/bin/bash
+          set -e
+          
+          echo "=== FreshOps AI EC2 Deployment ==="
+          
+          # Update system
+          sudo apt-get update
+          
+          # Check if Docker is installed
+          if ! command -v docker &> /dev/null; then
+            echo "[1/5] Installing Docker..."
+            sudo apt-get install -y docker.io
+            sudo usermod -aG docker $USER
+            sudo systemctl start docker
+          else
+            echo "[1/5] Docker already installed"
+          fi
+          
+          # Check if docker-compose is installed
+          if ! command -v docker-compose &> /dev/null; then
+            echo "[2/5] Installing docker-compose..."
+            sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+            sudo chmod +x /usr/local/bin/docker-compose
+          else
+            echo "[2/5] docker-compose already installed"
+          fi
+          
+          # Create deployment directory
+          echo "[3/5] Setting up deployment directory..."
+          mkdir -p /opt/freshops-ai
+          cd /opt/freshops-ai
+          
+          # Create docker-compose file
+          cat > docker-compose.yml << 'COMPOSE'
+          version: '3.8'
+          services:
+            backend:
+              image: $BACKEND_IMAGE
+              ports:
+                - "4000:4000"
+              environment:
+                - NODE_ENV=production
+                - MONGO_URI=$MONGO_URI
+                - AWS_ACCESS_KEY_ID=$AWS_ACCESS_KEY_ID
+                - AWS_SECRET_ACCESS_KEY=$AWS_SECRET_ACCESS_KEY
+                - AWS_REGION=$AWS_REGION
+                - CLARIFAI_PAT=$CLARIFAI_PAT
+                - CLARIFAI_USER_ID=$CLARIFAI_USER_ID
+                - CLARIFAI_APP_ID=$CLARIFAI_APP_ID
+                - CLARIFAI_MODEL_ID=$CLARIFAI_MODEL_ID
+              restart: unless-stopped
+            
+            frontend:
+              image: $FRONTEND_IMAGE
+              ports:
+                - "80:80"
+                - "8080:80"
+              depends_on:
+                - backend
+              restart: unless-stopped
+          COMPOSE
+          
+          # Login to ECR and pull latest images
+          echo "[4/5] Pulling latest Docker images from ECR..."
+          aws ecr get-login-password --region $AWS_REGION | docker login --username AWS --password-stdin $ECR_REGISTRY
+          
+          # Stop existing containers if running
+          docker-compose down || true
+          
+          # Pull and start containers
+          docker-compose pull
+          docker-compose up -d
+          
+          echo "[5/5] Deployment complete!"
+          echo "Frontend: http://$(hostname -I | awk '{print $1}'):8080"
+          echo "Backend: http://$(hostname -I | awk '{print $1}'):4000"
+          EOF
+          
+          chmod +x /tmp/deploy.sh
+          
+          # Copy and execute deployment script on EC2
+          scp -i ${{ secrets.SSH_PRIVATE_KEY }} -o StrictHostKeyChecking=no \
+            /tmp/deploy.sh ubuntu@${{ steps.ec2.outputs.public_ip }}:/tmp/deploy.sh
+          
+          ssh -i ${{ secrets.SSH_PRIVATE_KEY }} -o StrictHostKeyChecking=no \
+            ubuntu@${{ steps.ec2.outputs.public_ip }} \
+            "export BACKEND_IMAGE=${{ needs.build.outputs.backend-image }} && \
+             export FRONTEND_IMAGE=${{ needs.build.outputs.frontend-image }} && \
+             export ECR_REGISTRY=${{ env.ECR_REGISTRY }} && \
+             export AWS_REGION=${{ env.AWS_REGION }} && \
+             export MONGO_URI='${{ secrets.MONGO_URI }}' && \
+             export AWS_ACCESS_KEY_ID='${{ secrets.AWS_ACCESS_KEY_ID }}' && \
+             export AWS_SECRET_ACCESS_KEY='${{ secrets.AWS_SECRET_ACCESS_KEY }}' && \
+             export CLARIFAI_PAT='${{ secrets.CLARIFAI_PAT }}' && \
+             export CLARIFAI_USER_ID='${{ secrets.CLARIFAI_USER_ID }}' && \
+             export CLARIFAI_APP_ID='${{ secrets.CLARIFAI_APP_ID }}' && \
+             export CLARIFAI_MODEL_ID='${{ secrets.CLARIFAI_MODEL_ID }}' && \
+             bash /tmp/deploy.sh"
+
+      - name: Verify deployment
+        run: |
+          sleep 10
+          
+          # Check if services are responding
+          if curl -f http://${{ steps.ec2.outputs.public_ip }}:8080 > /dev/null 2>&1; then
+            echo "✓ Frontend is running"
+          else
+            echo "✗ Frontend failed to respond"
+            exit 1
+          fi
+          
+          if curl -f http://${{ steps.ec2.outputs.public_ip }}:4000/health > /dev/null 2>&1; then
+            echo "✓ Backend is running"
+          else
+            echo "✗ Backend failed to respond"
+            exit 1
+          fi
+          
+          echo ""
+          echo "✓ Deployment successful!"
+          echo "Frontend: http://${{ steps.ec2.outputs.public_ip }}:8080"
+          echo "Backend: http://${{ steps.ec2.outputs.public_ip }}:4000"
+
+      - name: Send deployment notification
+        if: always()
+        run: |
+          STATUS="success"
+          if [ "${{ job.status }}" != "success" ]; then
+            STATUS="failed"
+          fi
+          
+          echo "Deployment $STATUS"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref }}"
