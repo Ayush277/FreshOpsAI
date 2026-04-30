@@ -1,7 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 const navigationLinks = [
-  { label: 'Overview', path: '/', icon: '⬢' },
+  { label: 'Overboard', path: '/', icon: '⬢' },
   { label: 'Detection', path: '/upload', icon: '◉' },
   { label: 'Inventory', path: '/inventory', icon: '▤' },
   { label: 'Alerts', path: '/alerts', icon: '⚠' },
@@ -9,7 +9,7 @@ const navigationLinks = [
 
 export const AppShell = ({ title, subtitle, actions, children }) => {
   const location = useLocation();
-  const currentSection = navigationLinks.find((link) => link.path === location.pathname)?.label || 'Overview';
+  const currentSection = navigationLinks.find((link) => link.path === location.pathname)?.label || 'Overboard';
 
   return (
     <div className="app-shell">

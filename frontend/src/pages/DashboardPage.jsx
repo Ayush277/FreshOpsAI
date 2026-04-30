@@ -4,7 +4,7 @@ import { AppShell } from '../components/layout/AppShell';
 export const DashboardPage = () => {
   return (
     <AppShell
-      title="Operations Dashboard"
+      title="Dashboard"
       subtitle="Live inventory health and waste-performance snapshot"
     >
       <ExecutiveSummary />
