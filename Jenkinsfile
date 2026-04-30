@@ -1,3 +1,54 @@
+pipeline {
+  agent any
+
+  stages {
+    stage('Checkout') {
+      steps {
+        // Pull code from GitHub branch main
+        git url: 'https://github.com/Ayush277/FreshOpsAI.git', branch: 'main'
+      }
+    }
+
+    stage('Build Image') {
+      steps {
+        sh '''#!/bin/bash
+        set -eux
+        docker build -t freshopsai:latest .
+        '''
+      }
+    }
+
+    stage('Stop Container') {
+      steps {
+        // Stop any running container named freshopsai (ignore error if none exists)
+        sh 'docker stop freshopsai || true'
+      }
+    }
+
+    stage('Remove Container') {
+      steps {
+        // Remove the old container named freshopsai (ignore error if none exists)
+        sh 'docker rm freshopsai || true'
+      }
+    }
+
+    stage('Run Container') {
+      steps {
+        // Run new container
+        sh 'docker run -d --name freshopsai -p 8080:8080 freshopsai:latest'
+      }
+    }
+  }
+
+  post {
+    success {
+      echo 'Deployment successful: freshopsai running on port 8080'
+    }
+    failure {
+      echo 'Deployment failed'
+    }
+  }
+}
 #!/usr/bin/env groovy
 
 /*
