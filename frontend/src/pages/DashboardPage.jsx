@@ -5,7 +5,7 @@ export const DashboardPage = () => {
   return (
     <AppShell
       title="Dashboard"
-      subtitle="Live inventory health and waste-performance snapshot"
+      subtitle=""
     >
       <ExecutiveSummary />
 
