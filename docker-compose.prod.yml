@@ -6,7 +6,7 @@ services:
     restart: always
     # Point env_file to server-local file overriding development path
     env_file:
-      - .env
+      - ./backend/.env
     # IMPORTANT: The backend natively outputs structured JSON to standard out.
     # To stream logs directly to AWS CloudWatch instead of keeping them local, uncomment the following block
     # and ensure your EC2 instance has an IAM role with CloudWatch Logs write access (logs:PutLogEvents).

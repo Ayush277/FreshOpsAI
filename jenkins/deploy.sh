@@ -12,6 +12,8 @@ set -e
 # Disable interactive prompts for SSH
 export SSH_ARGS="-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null -o PasswordAuthentication=no -o BatchMode=yes"
 
+REMOTE_DIR="${REMOTE_DIR:-/home/${EC2_USER}/freshops-ai-deploy}"
+
 # Validate required variables
 if [ -z "$EC2_HOST" ] || [ -z "$EC2_USER" ] || [ -z "$SSH_KEY_PATH" ]; then
     echo "============================================================"
@@ -26,13 +28,18 @@ echo "🚀 Initiating deployment to ${EC2_USER}@${EC2_HOST}..."
 
 # 1. Create a deployment directory on the EC2 instance
 echo "📂 Preparing deployment directory..."
-ssh -i "$SSH_KEY_PATH" $SSH_ARGS "${EC2_USER}@${EC2_HOST}" "mkdir -p ~/freshops-ai-deploy"
+ssh -i "$SSH_KEY_PATH" $SSH_ARGS "${EC2_USER}@${EC2_HOST}" "mkdir -p '$REMOTE_DIR'"
 
-# 2. Securely copy the Compose orchestration files to the instance
-echo "📦 Transferring docker-compose files..."
-scp -i "$SSH_KEY_PATH" $SSH_ARGS \
-    docker-compose.yml docker-compose.prod.yml \
-    "${EC2_USER}@${EC2_HOST}:~/freshops-ai-deploy/"
+# 2. Sync the application source to the instance
+echo "📦 Transferring application source..."
+rsync -az --delete \
+    -e "ssh -i '$SSH_KEY_PATH' $SSH_ARGS" \
+    --exclude '.git' \
+    --exclude '.github' \
+    --exclude 'node_modules' \
+    --exclude 'frontend/node_modules' \
+    --exclude 'backend/node_modules' \
+    . "${EC2_USER}@${EC2_HOST}:$REMOTE_DIR/"
 
 # 3. SSH into the instance to execute the deployment
 echo "🚢 Pulling and restarting containers on the host..."
@@ -40,28 +47,19 @@ ssh -i "$SSH_KEY_PATH" $SSH_ARGS "${EC2_USER}@${EC2_HOST}" << EOF
     # Exit if any command on the remote server fails
     set -e
 
-    cd ~/freshops-ai-deploy
+    cd "$REMOTE_DIR"
 
-    # NOTE: Assuming the \`.env\` file containing AWS / DB secrets is securely 
-    # maintained on the EC2 host at ~/freshops-ai-deploy/.env
+    # NOTE: The repository sync should include backend/.env or the server-local
+    # environment file already present on the EC2 host.
     if [ ! -f .env ]; then
         echo "⚠️ Warning: .env file not found in the deployment directory!"
     fi
 
-    # Optional: Log into Docker Hub/ECR if images are private 
-    # (Requires DOCKER_USER and DOCKER_PASS variables injected)
-    # echo "$DOCKER_PASS" | docker login -u "$DOCKER_USER" --password-stdin
-
-    echo "⬇️ Pulling latest images..."
-    # Export specific image vars so compose picks them up if deployed via Jenkins
-    export BACKEND_IMAGE="${LATEST_BACKEND:-freshops-backend:latest}"
-    export FRONTEND_IMAGE="${LATEST_FRONTEND:-freshops-frontend:latest}"
-
-    # Suppress warnings if local image builds weren't pushed during testing
-    docker compose -f docker-compose.yml -f docker-compose.prod.yml pull || true
-
     echo "🔄 Recreating and starting containers..."
-    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --force-recreate
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d --build --remove-orphans
+
+    echo "🔍 Container status..."
+    docker compose -f docker-compose.yml -f docker-compose.prod.yml ps
 
     echo "🧹 Pruning old dangling images to save disk space..."
     docker image prune -a -f --filter "until=24h"
