@@ -10,7 +10,7 @@ export const DashboardPage = () => {
       <ExecutiveSummary />
 
       <section className="insight-panel">
-        <h3>Decision Support</h3>
+        <h3>Support</h3>
         <p>
           Track expiring inventory in real time, reduce avoidable spoilage, and prioritize replenishment using AI-assisted shelf-life signals.
         </p>
