@@ -16,7 +16,7 @@ export const AppShell = ({ title, subtitle, actions, children }) => {
       <aside className="app-sidebar">
         <div className="brand-block">
           <span className="brand-badge">FreshOps AI</span>
-          <h1>Perishable Intelligence</h1>
+          <h1>FreshOps</h1>
           <p>Operational visibility for every shelf-life decision.</p>
           <span className="brand-live">LIVE TELEMETRY</span>
         </div>
