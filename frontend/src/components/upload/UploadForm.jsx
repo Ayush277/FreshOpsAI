@@ -10,35 +10,32 @@ export const UploadForm = ({ onSubmit, loading }) => {
   const [imagePreviewUrl, setImagePreviewUrl] = useState('');
 
   useEffect(() => {
-    if (!imageFile) {
-      setImagePreviewUrl('');
-      return undefined;
-    }
-
-    const objectUrl = URL.createObjectURL(imageFile);
-    setImagePreviewUrl(objectUrl);
-
     return () => {
-      URL.revokeObjectURL(objectUrl);
+      if (imagePreviewUrl) {
+        URL.revokeObjectURL(imagePreviewUrl);
+      }
     };
-  }, [imageFile]);
+  }, [imagePreviewUrl]);
 
   const handleFileChange = (event) => {
     const nextFile = event.target.files?.[0] || null;
 
     if (!nextFile) {
       setImageFile(null);
+      setImagePreviewUrl('');
       setFileError('');
       return;
     }
 
     if (!nextFile.type.startsWith('image/')) {
       setImageFile(null);
+      setImagePreviewUrl('');
       setFileError('Please select a valid image file.');
       return;
     }
 
     setFileError('');
+    setImagePreviewUrl(URL.createObjectURL(nextFile));
     setImageFile(nextFile);
   };
 

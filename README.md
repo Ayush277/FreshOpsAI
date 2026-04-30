@@ -38,7 +38,7 @@ FreshOps AI follows a modular, backend-first Microservices/SPA architecture, ful
 | **AI Integration** | Clarifai API |
 | **Containerization**| Docker, Docker Compose |
 | **Infrastructure** | Terraform (AWS EC2, S3, Security Groups) |
-| **CI/CD** | GitHub Actions → AWS EC2 (server deployment) |
+| **CI/CD** | Jenkins (Pipeline-as-Code) |
 
 ---
 
@@ -151,22 +151,21 @@ We use **Terraform** to provision the cloud infrastructure.
 
 ---
 
-## 🚀 CI/CD on AWS
+## 🚀 CI/CD with Jenkins
 
-FreshOps AI is deployed to the existing AWS EC2 server at `http://107.22.48.62:8080/`.
+FreshOps AI is equipped with a production-ready declarative **Jenkinsfile**.
 
-### How it works
-1. **Push to `main`**: GitHub Actions starts automatically whenever code is merged or pushed to `main`.
-2. **Validate**: The workflow installs dependencies and builds the frontend so broken changes fail before deployment.
-3. **Sync to EC2**: The workflow copies the updated repository to the AWS server over SSH.
-4. **Restart containers**: The server runs `docker compose up -d --build --remove-orphans`, so the live site reflects the new code.
+### Pipeline Stages:
+1. **Checkout**: Pulls the latest code from GitHub.
+2. **Build**: Compiles both `backend` and `frontend` Docker images.
+3. **Test**: Executes unit testing suites (Optional/Extensible).
+4. **Deploy**: Securely SSHes into the provisioned EC2 instance using `./jenkins/deploy.sh` and deploys the new images using `docker compose` with the production overrides (`docker-compose.prod.yml`).
 
-### What to configure in GitHub
-- `EC2_SSH_PRIVATE_KEY`: SSH private key for the AWS instance.
-- `MONGO_URI`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `CLARIFAI_PAT`, `CLARIFAI_USER_ID`, `CLARIFAI_APP_ID`, `CLARIFAI_MODEL_ID`.
-
-### Demo result
-After a successful push, the updated version should appear automatically at `http://107.22.48.62:8080/`.
+### Production Overrides:
+The deployment utilizes `docker-compose.prod.yml` which:
+- Maps the frontend to the native host port `80`.
+- Configures `restart: always` for high availability.
+- (Optional) Configures the Docker `awslogs` driver to stream structured JSON backend logs directly to **AWS CloudWatch**.
 
 ---
 
