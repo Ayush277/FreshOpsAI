@@ -4,7 +4,7 @@ import { AppShell } from '../components/layout/AppShell';
 export const DashboardPage = () => {
   return (
     <AppShell
-      title="Dashboard"
+      title="Ayush Dashboard"
       subtitle=""
     >
       <ExecutiveSummary />
