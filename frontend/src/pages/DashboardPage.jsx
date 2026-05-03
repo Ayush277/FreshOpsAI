@@ -4,7 +4,7 @@ import { AppShell } from '../components/layout/AppShell';
 export const DashboardPage = () => {
   return (
     <AppShell
-      title="DEVOPS changes"
+      title="DEVOPS BATCH 2 -AYUSH"
       subtitle=""
     >
       <ExecutiveSummary />
